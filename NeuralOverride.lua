@@ -12,7 +12,7 @@ local UserInputService = game:GetService("UserInputService")
 local player = Players.LocalPlayer
 
 -- ===== НАСТРОЙКИ =====
-local OPENROUTER_API_KEY = "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"  -- ЗАМЕНИТЕ
+local OPENROUTER_API_KEY = "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"  -- ЗАМЕНИТЕ
 local OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 local MODEL = "meta-llama/llama-3-8b-instruct:free"
 
