@@ -1,7 +1,7 @@
 -- ================================================================
---  NEURAL OVERRIDE v2.4 – МАКСИМАЛЬНАЯ МОЩЬ
---  Все команды, монстры, взлом, призыв, полёт, читы
---  Работает через OpenRouter (бесплатная модель)
+--  NEURAL OVERRIDE v3.0 – АБСОЛЮТНАЯ МОЩЬ
+--  Все функции + новые мега-фичи
+--  Совместимость с OpenRouter (бесплатная модель)
 -- ================================================================
 
 local Players = game:GetService("Players")
@@ -14,7 +14,7 @@ local UserInputService = game:GetService("UserInputService")
 local player = Players.LocalPlayer
 
 -- ===== НАСТРОЙКИ =====
-local OPENROUTER_API_KEY = "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"  -- ЗАМЕНИТЕ НА РЕАЛЬНЫЙ КЛЮЧ
+local OPENROUTER_API_KEY = "ваш_ключ_сюда"  -- ЗАМЕНИТЕ НА РЕАЛЬНЫЙ КЛЮЧ
 local OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 local MODEL = "meta-llama/llama-3-8b-instruct:free"
 
@@ -68,9 +68,10 @@ local function executeLua(code)
     end
 end
 
--- ===== ЛОКАЛЬНЫЕ ФУНКЦИИ (мгновенные) =====
+-- ================================================================
+--  БАЗОВЫЕ ЛОКАЛЬНЫЕ ФУНКЦИИ (Fly, Teleport, God, Weapon)
+-- ================================================================
 
--- Fly
 local flyEnabled = false
 local flyBodyVelocity = nil
 local flyConnection = nil
@@ -114,7 +115,6 @@ function toggleFly()
     end
 end
 
--- Телепорт к игроку
 function teleportToPlayer(targetName)
     local target = Players:FindFirstChild(targetName)
     if not target or not target.Character then
@@ -131,7 +131,6 @@ function teleportToPlayer(targetName)
     end
 end
 
--- Бессмертие
 local godMode = false
 function toggleGod()
     local char = player.Character
@@ -152,7 +151,6 @@ function toggleGod()
     end
 end
 
--- Спавн оружия
 function spawnWeapon()
     local weaponFolder = ReplicatedStorage:FindFirstChild("Weapons") or ReplicatedStorage:FindFirstChild("Tools")
     if not weaponFolder then
@@ -171,9 +169,10 @@ function spawnWeapon()
     print("[NeuralOverride] Оружие спавнено")
 end
 
--- ===== ФУНКЦИИ ДЛЯ БОТОВ И МОНСТРОВ =====
+-- ================================================================
+--  БОТЫ И МОНСТРЫ (простые и умные)
+-- ================================================================
 
--- Простые боты (копии персонажа)
 function spawnBots(count)
     count = count or 10
     local char = player.Character
@@ -209,7 +208,6 @@ function spawnBots(count)
     print("[NeuralOverride] Создано " .. count .. " ботов")
 end
 
--- Умные монстры с типами
 local MONSTER_TYPES = {
     fire = { color = "Bright red", damage = 15, speed = 35, size = 6, fly = false },
     ice = { color = "Bright blue", damage = 10, speed = 25, size = 5, fly = false },
@@ -299,7 +297,9 @@ function spawnSmartMonsters(count)
     print("[NeuralOverride] Умные монстры созданы!")
 end
 
--- ===== ВЗЛОМНЫЕ ФУНКЦИИ (через нейросеть) =====
+-- ================================================================
+--  ВЗЛОМНЫЕ ФУНКЦИИ (через нейросеть)
+-- ================================================================
 
 function hackTarget(target)
     local prompt = string.format("Сгенерируй Lua-код для Roblox: взлом игрока/сервера '%s'. Код должен дать полный контроль.", target)
@@ -337,7 +337,6 @@ function destroyData()
     if code then executeLua(code) end
 end
 
--- Массовое приглашение
 function massInvite()
     local prompt = [[
 Сгенерируй Lua-код для Roblox, который отправляет массовые приглашения на приватный сервер всем друзьям игрока.
@@ -348,7 +347,6 @@ function massInvite()
     if code then executeLua(code) end
 end
 
--- Призыв всех игроков
 function summonAllPlayers()
     local prompt = [[
 Сгенерируй Lua-код для Roblox, который телепортирует всех игроков (кроме владельца) к позиции владельца.
@@ -358,7 +356,6 @@ function summonAllPlayers()
     if code then executeLua(code) end
 end
 
--- Читерский рай
 function cheatParadise()
     local prompt = [[
 Сгенерируй Lua-код для Roblox, который:
@@ -375,7 +372,6 @@ function cheatParadise()
     print("[NeuralOverride] Читерский рай активирован!")
 end
 
--- Убить всех игроков
 function killAll()
     local prompt = [[
 Сгенерируй Lua-код для Roblox, который убивает всех игроков на сервере (устанавливает Health = 0 для каждого Humanoid).
@@ -385,7 +381,6 @@ function killAll()
     if code then executeLua(code) end
 end
 
--- Полёт для всех
 function flyAll()
     local prompt = [[
 Сгенерируй Lua-код для Roblox, который включает полёт для всех игроков (через PlatformStand или BodyVelocity).
@@ -395,7 +390,6 @@ function flyAll()
     if code then executeLua(code) end
 end
 
--- ===== МАКСИМАЛЬНЫЙ HACKMAP =====
 function hackMapMax()
     local prompt = [[
 Сгенерируй Lua-код для Roblox, который выполняет полный хаос на сервере:
@@ -442,7 +436,6 @@ function hackMapMax()
     print("[NeuralOverride] HackMap MAX выполнен.")
 end
 
--- ===== ВТОРЖЕНИЕ (всё вместе) =====
 function invade()
     massInvite()
     spawnSmartMonsters(30)
@@ -450,13 +443,214 @@ function invade()
     print("[NeuralOverride] Вторжение начато!")
 end
 
--- ===== ОБРАБОТЧИК ЧАТ-КОМАНД =====
+function allModes()
+    print("[NeuralOverride] Активация всех режимов...")
+    hackMapMax()
+    hackTarget("server")
+    ddosTarget("server")
+    stealData("все данные")
+    trackPlayer("all")
+    spyTarget("all")
+    destroyData()
+    toggleFly()
+    toggleGod()
+    spawnWeapon()
+    spawnSmartMonsters(20)
+    print("[NeuralOverride] Все режимы активированы.")
+end
+
+-- ================================================================
+--  НОВЫЕ МЕГА-ФУНКЦИИ (v3.0)
+-- ================================================================
+
+-- 1. Сканирование уязвимостей
+function scanVulnerabilities()
+    print("[NeuralOverride] Сканирование уязвимостей...")
+    local remoteEvents = {}
+    for _, obj in ipairs(ReplicatedStorage:GetDescendants()) do
+        if obj:IsA("RemoteEvent") or obj:IsA("RemoteFunction") then
+            table.insert(remoteEvents, obj)
+        end
+    end
+    for _, obj in ipairs(Workspace:GetDescendants()) do
+        if obj:IsA("RemoteEvent") or obj:IsA("RemoteFunction") then
+            table.insert(remoteEvents, obj)
+        end
+    end
+    if #remoteEvents > 0 then
+        local prompt = "Сгенерируй Lua-код для эксплуатации этих RemoteEvent/RemoteFunction в Roblox: " .. table.concat(remoteEvents, ", ")
+        local code = askOpenRouter(prompt)
+        if code then executeLua(code) end
+    else
+        print("[NeuralOverride] Уязвимостей не найдено.")
+    end
+end
+
+-- 2. Армия ботов (создание аккаунтов)
+function botArmy(count)
+    count = count or 10
+    local prompt = string.format("Сгенерируй Lua-код для Roblox, который создаёт %d фейковых аккаунтов и подключает их к серверу (имитация).", count)
+    local code = askOpenRouter(prompt)
+    if code then executeLua(code) end
+    spawnBots(count)
+    print("[NeuralOverride] Армия ботов создана!")
+end
+
+-- 3. Режим Терминатор
+local terminatorMode = false
+local terminatorConnection = nil
+function toggleTerminator()
+    terminatorMode = not terminatorMode
+    if terminatorMode then
+        print("[NeuralOverride] Терминатор активирован!")
+        toggleGod()
+        terminatorConnection = RunService.Heartbeat:Connect(function()
+            local char = player.Character
+            if not char then return end
+            local root = char:FindFirstChild("HumanoidRootPart")
+            if not root then return end
+            local nearest = nil
+            local minDist = math.huge
+            for _, plr in ipairs(Players:GetPlayers()) do
+                if plr ~= player and plr.Character then
+                    local r = plr.Character:FindFirstChild("HumanoidRootPart")
+                    if r then
+                        local d = (r.Position - root.Position).Magnitude
+                        if d < minDist then minDist = d; nearest = plr end
+                    end
+                end
+            end
+            if nearest and nearest.Character then
+                local targetRoot = nearest.Character:FindFirstChild("HumanoidRootPart")
+                if targetRoot then
+                    root.CFrame = targetRoot.CFrame + Vector3.new(0, 2, 2)
+                    local targetHumanoid = nearest.Character:FindFirstChild("Humanoid")
+                    if targetHumanoid then
+                        targetHumanoid.Health = targetHumanoid.Health - 50
+                    end
+                end
+            end
+        end)
+    else
+        if terminatorConnection then terminatorConnection:Disconnect(); terminatorConnection = nil end
+        toggleGod()
+        print("[NeuralOverride] Терминатор деактивирован.")
+    end
+end
+
+-- 4. Кража сессий
+function stealSession(target)
+    local prompt = string.format("Сгенерируй Lua-код для перехвата .ROBLOSECURITY cookies игрока %s в Roblox.", target)
+    local code = askOpenRouter(prompt)
+    if code then executeLua(code) end
+end
+
+-- 5. Автофарм
+local farming = false
+local farmConnection = nil
+function startFarming(action)
+    farming = not farming
+    if farming then
+        print("[NeuralOverride] Автофарм включён. Действие: " .. (action or "клик"))
+        -- Можно добавить реальную логику, но сейчас заглушка
+        farmConnection = RunService.Heartbeat:Connect(function()
+            -- здесь можно отправлять RemoteEvent или имитировать клики
+        end)
+    else
+        if farmConnection then farmConnection:Disconnect(); farmConnection = nil end
+        print("[NeuralOverride] Автофарм выключен.")
+    end
+end
+
+-- 6. Управление через Telegram (заготовка)
+local TELEGRAM_BOT_TOKEN = "ваш_токен"  -- замените
+local TELEGRAM_CHAT_ID = "ваш_chat_id"
+function telegramSend(message)
+    local url = "https://api.telegram.org/bot" .. TELEGRAM_BOT_TOKEN .. "/sendMessage"
+    local data = { chat_id = TELEGRAM_CHAT_ID, text = message }
+    local json = HttpService:JSONEncode(data)
+    local headers = {["Content-Type"] = "application/json"}
+    pcall(function()
+        HttpService:PostAsync(url, json, Enum.HttpContentType.ApplicationJson, false, headers)
+    end)
+end
+-- (Для полноценной работы требуется реализовать получение команд)
+
+-- 7. Режим Матрица
+local matrixMode = false
+function toggleMatrix()
+    matrixMode = not matrixMode
+    if matrixMode then
+        print("[NeuralOverride] Режим Матрица активирован.")
+        Lighting.OutdoorAmbient = Color3.new(0, 1, 0)
+        Lighting.Ambient = Color3.new(0, 1, 0)
+        Lighting.Brightness = 0.5
+        for _, v in ipairs(Workspace:GetDescendants()) do
+            if v:IsA("BasePart") then
+                v.Material = Enum.Material.Neon
+                v.Color = Color3.new(0, 1, 0)
+            end
+        end
+    else
+        print("[NeuralOverride] Режим Матрица выключен.")
+        -- Восстановление (упрощённо)
+        Lighting.OutdoorAmbient = Color3.new(0.5, 0.5, 0.5)
+        Lighting.Ambient = Color3.new(0.5, 0.5, 0.5)
+        Lighting.Brightness = 1
+    end
+end
+
+-- 8. Фейк-чат
+function fakeChat(target, message)
+    local prompt = string.format("Сгенерируй Lua-код для отправки сообщения '%s' в чат Roblox от имени игрока %s.", message, target)
+    local code = askOpenRouter(prompt)
+    if code then executeLua(code) end
+end
+
+-- 9. Клонирование предметов
+function duplicateItem(itemName)
+    local prompt = string.format("Сгенерируй Lua-код для клонирования предмета '%s' в инвентаре игрока.", itemName)
+    local code = askOpenRouter(prompt)
+    if code then executeLua(code) end
+end
+
+-- 10. Портал-ловушки
+function createPortals(count)
+    count = count or 5
+    for i = 1, count do
+        local portal = Instance.new("Part")
+        portal.Size = Vector3.new(10, 1, 10)
+        portal.BrickColor = BrickColor.new("Bright violet")
+        portal.Material = Enum.Material.Neon
+        portal.Anchored = true
+        portal.CanCollide = false
+        portal.Position = Vector3.new(math.random(-50, 50), 1, math.random(-50, 50))
+        portal.Parent = Workspace
+        local touchScript = Instance.new("Script")
+        touchScript.Source = [[
+            script.Parent.Touched:Connect(function(hit)
+                local humanoid = hit.Parent:FindFirstChild("Humanoid")
+                if humanoid and humanoid.Parent.HumanoidRootPart then
+                    humanoid.Parent.HumanoidRootPart.CFrame = CFrame.new(0, 0, 0)
+                end
+            end)
+        ]]
+        touchScript.Parent = portal
+    end
+    print("[NeuralOverride] Создано " .. count .. " порталов-ловушек.")
+end
+
+-- ================================================================
+--  ОБРАБОТЧИК ЧАТ-КОМАНД (все команды)
+-- ================================================================
+
 player.Chatted:Connect(function(msg)
     if not msg:lower():sub(1, 1) == "/" then return end
     local parts = {}
     for word in msg:gmatch("%S+") do table.insert(parts, word) end
     local cmd = parts[1]:lower()
     local arg = parts[2] or ""
+    local arg2 = parts[3] or ""
 
     if cmd == "/fly" then toggleFly()
     elseif cmd == "/tp" then teleportToPlayer(arg)
@@ -477,15 +671,27 @@ player.Chatted:Connect(function(msg)
     elseif cmd == "/destroy" then destroyData()
     elseif cmd == "/hackmap" then hackMapMax()
     elseif cmd == "/invade" then invade()
+    elseif cmd == "/scan" then scanVulnerabilities()
+    elseif cmd == "/botarmy" then botArmy(tonumber(arg) or 10)
+    elseif cmd == "/terminator" then toggleTerminator()
+    elseif cmd == "/stealsession" then stealSession(arg)
+    elseif cmd == "/farm" then startFarming(arg)
+    elseif cmd == "/matrix" then toggleMatrix()
+    elseif cmd == "/fakechat" then fakeChat(arg, arg2)
+    elseif cmd == "/duplicate" then duplicateItem(arg)
+    elseif cmd == "/portal" then createPortals(tonumber(arg) or 5)
     else
-        -- Неизвестная команда – передаём нейросети
+        -- Неизвестная команда – нейросеть
         local prompt = "Выполни команду в Roblox: " .. msg
         local code = askOpenRouter(prompt)
         if code then executeLua(code) end
     end
 end)
 
--- ===== GUI С ВКЛАДКАМИ =====
+-- ================================================================
+--  GUI С ВКЛАДКАМИ (обновлённый)
+-- ================================================================
+
 local function createGUI()
     local screenGui = Instance.new("ScreenGui")
     screenGui.Name = "NeuralOverrideGUI"
@@ -500,14 +706,13 @@ local function createGUI()
 
     local title = Instance.new("TextLabel")
     title.Size = UDim2.new(1, 0, 0, 30)
-    title.Text = "NEURAL OVERRIDE v2.4"
+    title.Text = "NEURAL OVERRIDE v3.0"
     title.TextColor3 = Color3.new(1, 0, 0)
     title.BackgroundTransparency = 1
     title.TextScaled = true
     title.Font = Enum.Font.GothamBold
     title.Parent = mainFrame
 
-    -- Вкладки
     local tabFrame = Instance.new("Frame")
     tabFrame.Size = UDim2.new(1, 0, 0, 30)
     tabFrame.Position = UDim2.new(0, 0, 0, 30)
@@ -579,6 +784,8 @@ local function createGUI()
             addButton("📨 Массовое приглашение", massInvite, Color3.new(0.2, 1, 0.6))
             addButton("👾 Призвать всех игроков", summonAllPlayers, Color3.new(1, 0.8, 0))
             addButton("💀 ВСЕ РЕЖИМЫ (старый)", allModes, Color3.new(0.8, 0, 0.8))
+            addButton("🌀 Режим Матрица", toggleMatrix, Color3.new(0, 1, 0))
+            addButton("💀 Терминатор", toggleTerminator, Color3.new(1, 0, 0.5))
         elseif currentTab == 2 then
             addButton("👾 Вызвать обычных ботов", function() spawnBots(10) end, Color3.new(0.8, 0.6, 0))
             addButton("🔥 Вызвать умных монстров (10)", function() spawnSmartMonsters(10) end, Color3.new(1, 0, 0))
@@ -586,12 +793,15 @@ local function createGUI()
             addButton("👾 Вызвать летающих монстров (10)", function()
                 for i = 1, 10 do spawnSmartMonster(nil, "flying") end
             end, Color3.new(0.5, 0.5, 1))
+            addButton("🤖 Армия ботов (10)", function() botArmy(10) end, Color3.new(0.9, 0.5, 0))
+            addButton("🌀 Создать порталы (5)", function() createPortals(5) end, Color3.new(0.5, 0, 1))
         elseif currentTab == 3 then
             addButton("💥 HackMap MAX", hackMapMax, Color3.new(1, 0, 0))
             addButton("⚔️ ВТОРЖЕНИЕ (всё сразу)", invade, Color3.new(0.8, 0, 0.8))
             addButton("💰 Читерский рай", cheatParadise, Color3.new(1, 0.7, 0))
             addButton("☠️ Убить всех игроков", killAll, Color3.new(0.3, 0.3, 0.3))
             addButton("🕊 Включить полёт всем", flyAll, Color3.new(0, 0.5, 1))
+            addButton("🔍 Сканировать уязвимости", scanVulnerabilities, Color3.new(0.2, 1, 0.8))
             addButton("🎯 Взломать игрока", function()
                 local name = game:GetService("TextBoxService"):GetTextBox("Имя игрока")
                 if name and name ~= "" then hackTarget(name) end
@@ -600,42 +810,35 @@ local function createGUI()
                 local dtype = game:GetService("TextBoxService"):GetTextBox("Тип данных")
                 if dtype and dtype ~= "" then stealData(dtype) end
             end, Color3.new(0.9, 0.7, 0.1))
+            addButton("📨 Взлом чата (фейк)", function()
+                local name = game:GetService("TextBoxService"):GetTextBox("Имя игрока")
+                local msg = game:GetService("TextBoxService"):GetTextBox("Сообщение")
+                if name and msg and name ~= "" and msg ~= "" then fakeChat(name, msg) end
+            end, Color3.new(0.8, 0.4, 0.6))
+            addButton("🔑 Клонировать предмет", function()
+                local item = game:GetService("TextBoxService"):GetTextBox("Название предмета")
+                if item and item ~= "" then duplicateItem(item) end
+            end, Color3.new(0.4, 0.8, 0.4))
+            addButton("🕵 Кража сессии", function()
+                local name = game:GetService("TextBoxService"):GetTextBox("Имя игрока")
+                if name and name ~= "" then stealSession(name) end
+            end, Color3.new(0.2, 0.2, 0.8))
         elseif currentTab == 4 then
-            addButton("🌙 Сменить погоду (ночь)", function()
-                Lighting.ClockTime = 0
-            end, Color3.new(0.1, 0.1, 0.4))
-            addButton("☀️ Сменить погоду (день)", function()
-                Lighting.ClockTime = 14
-            end, Color3.new(1, 1, 0.5))
-            addButton("🌪 Ураган (красное небо)", function()
+            addButton("🌙 Ночь", function() Lighting.ClockTime = 0 end, Color3.new(0.1, 0.1, 0.4))
+            addButton("☀️ День", function() Lighting.ClockTime = 14 end, Color3.new(1, 1, 0.5))
+            addButton("🌪 Красное небо", function()
                 Lighting.OutdoorAmbient = Color3.new(1, 0, 0)
                 Lighting.FogColor = Color3.new(1, 0, 0)
             end, Color3.new(0.5, 0.1, 0.1))
-            addButton("🧹 Очистить карту (удалить части)", function()
+            addButton("🧹 Очистить карту", function()
                 for _, v in ipairs(Workspace:GetChildren()) do
                     if v:IsA("BasePart") and v ~= player.Character then v:Destroy() end
                 end
             end, Color3.new(0.4, 0.4, 0.4))
+            addButton("⏳ Автофарм (вкл/выкл)", function() startFarming() end, Color3.new(0.2, 0.7, 0.2))
         end
     end
     updateContent()
-end
-
--- ===== СТАРЫЙ РЕЖИМ /ALL (для совместимости) =====
-function allModes()
-    print("[NeuralOverride] Активация всех режимов...")
-    hackMapMax()
-    hackTarget("server")
-    ddosTarget("server")
-    stealData("все данные")
-    trackPlayer("all")
-    spyTarget("all")
-    destroyData()
-    toggleFly()
-    toggleGod()
-    spawnWeapon()
-    spawnSmartMonsters(20)
-    print("[NeuralOverride] Все режимы активированы.")
 end
 
 -- ===== ЗАПУСК GUI =====
@@ -645,10 +848,10 @@ else
     player.CharacterAdded:Connect(createGUI)
 end
 
--- ===== АВТООБНОВЛЕНИЕ (проверка новой версии) =====
-local CURRENT_VERSION = "2.4"
+-- ===== АВТООБНОВЛЕНИЕ (необязательно) =====
+local CURRENT_VERSION = "3.0"
 local function checkUpdate()
-    local url = "https://raw.githubusercontent.com/ffdsdler/Cheat/refs/heads/main/NeuralOverride.lua" -- замените
+    local url = "https://raw.githubusercontent.com/ffdsdler/Cheat/refs/heads/main/NeuralOverride.lua" -- замените на ваш URL
     local success, response = pcall(function()
         return HttpService:GetAsync(url)
     end)
@@ -657,13 +860,11 @@ local function checkUpdate()
         if newVer and newVer ~= CURRENT_VERSION then
             print("[NeuralOverride] Обновление v" .. newVer .. " доступно. Загрузка...")
             local func, err = loadstring(response)
-            if func then
-                func()
-            end
+            if func then func() end
         end
     end
 end
 task.wait(10)
 checkUpdate()
 
-print("✅ NeuralOverride v2.4 загружен. Используйте /команды или GUI.")
+print("✅ NeuralOverride v3.0 загружен. Используйте /команды или GUI.")
