@@ -648,7 +648,7 @@ end
 -- ===== АВТООБНОВЛЕНИЕ (проверка новой версии) =====
 local CURRENT_VERSION = "2.4"
 local function checkUpdate()
-    local url = "https://raw.githubusercontent.com/Cheat/NeuralOverride.lua" -- замените
+    local url = "https://raw.githubusercontent.com/ffdsdler/Cheat/refs/heads/main/NeuralOverride.lua" -- замените
     local success, response = pcall(function()
         return HttpService:GetAsync(url)
     end)
