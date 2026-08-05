@@ -14,7 +14,7 @@ local player = Players.LocalPlayer
 -- ===== НАСТРОЙКИ =====
 local OPENROUTER_API_KEY = "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"  -- ЗАМЕНИТЕ
 local OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
-local MODEL = "meta-llama/llama-3-8b-instruct:free"
+local MODEL = "openrouter/free"
 
 -- ===== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =====
 
