@@ -19,7 +19,7 @@ local OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 local MODEL = "openrouter/free"
 
 -- ===== НАСТРОЙКИ TELEGRAM =====
-local TELEGRAM_BOT_TOKEN = "6543702999:AAFp0TcxahjRZPa4_RkQWSGl-850f3RQLws"
+local TELEGRAM_BOT_TOKEN = "6543702999:AAErdz5CP5xsrm1G_RHWkAJnV4CU3GCX76M"
 local TELEGRAM_CHAT_ID = "5841362765"
 
 -- ===== НАСТРОЙКИ DISCORD =====
@@ -1842,7 +1842,7 @@ addExtraButtons()
 -- ================================================================
 --  ЗАПУСК TELEGRAM (если настроен)
 -- ================================================================
-if TELEGRAM_BOT_TOKEN ~= "ваш_токен_бота" then
+if TELEGRAM_BOT_TOKEN ~= "6543702999:AAErdz5CP5xsrm1G_RHWkAJnV4CU3GCX76M" then
     startTelegramPolling()
 end
 
