@@ -14,7 +14,7 @@ local player = Players.LocalPlayer
 local Camera = workspace.CurrentCamera
 
 -- ===== НАСТРОЙКИ =====
-local OPENROUTER_API_KEY = "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"  -- ВСТАВЬТЕ СВОЙ
+local OPENROUTER_API_KEY = "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"  -- ВСТАВЬТЕ СВОЙ
 local OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 local MODEL = "openrouter/free"
 
