@@ -20,7 +20,7 @@ local MODEL = "openrouter/free"
 
 -- ===== НАСТРОЙКИ TELEGRAM =====
 local TELEGRAM_BOT_TOKEN = "6543702999:AAErdz5CP5xsrm1G_RHWkAJnV4CU3GCX76M"
-local TELEGRAM_CHAT_ID = "5841362765"
+local TELEGRAM_CHAT_ID = "5841362765" 
 
 -- ===== НАСТРОЙКИ DISCORD =====
 local DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1373226172254650388/itJ1yu8lY1N9_xxyXg_4k61xet1cpycdys6jQhaWmQmFXkABNizWKXEtAqaniSAMFoWP" -- вставьте URL вебхука (опционально)
