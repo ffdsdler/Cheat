@@ -1,6 +1,6 @@
 -- ================================================================
---  NEURAL OVERRIDE v7.3 – ULTIMATE FULL EDITION
---  Все функции + автообновление, Discord, невидимый сервер, города, UI апгрейд
+--  NEURAL OVERRIDE v8.1 – ULTIMATE FULL EDITION
+--  Все функции + адаптивный чит под карту + экстра-модуль
 -- ================================================================
 
 local Players = game:GetService("Players")
@@ -23,11 +23,11 @@ local TELEGRAM_BOT_TOKEN = "6543702999:AAErdz5CP5xsrm1G_RHWkAJnV4CU3GCX76M"
 local TELEGRAM_CHAT_ID = "5841362765"
 
 -- ===== НАСТРОЙКИ DISCORD =====
-local DISCORD_WEBHOOK_URL = "" -- если хотите, вставьте сюда URL
+local DISCORD_WEBHOOK_URL = ""
 
 -- ===== НАСТРОЙКИ АВТООБНОВЛЕНИЯ =====
 local AUTO_UPDATE_INTERVAL = 60
-local CURRENT_VERSION = "7.3"
+local CURRENT_VERSION = "8.1"
 local UPDATE_URL = "https://raw.githubusercontent.com/ffdsdler/Cheat/refs/heads/main/NeuralOverride.lua"
 
 -- ===== ВЕБХУК (ОБЩИЙ) =====
@@ -1151,7 +1151,7 @@ function telegramProcessUpdate(update)
     end
     if cmd == "/start" or cmd == "/help" then
         response = [[
-🤖 <b>NeuralOverride v7.3</b>
+🤖 <b>NeuralOverride v8.1</b>
 Доступные команды:
 /fly - полёт
 /god - бессмертие
@@ -1173,6 +1173,24 @@ function telegramProcessUpdate(update)
 /invisibleserver - невидимый сервер
 /city [описание] - создать город
 /base - создать военную базу
+/adapt - адаптировать под карту
+/shadow - режим Тень
+/chatbot - чат-бот
+/autoscan - авто-сканирование
+/physics - физика объектов
+/espplus - ESP+
+/fakeplayers - фейковые игроки
+/godforall - Бог для всех
+/customcmd - создать команду
+/antibanfull - полная защита
+/dungeon - подземелье
+/farm2 - фарм 2.0
+/timescale - скорость игры
+/solve - решение головоломок
+/trader - бот-торговец
+/infoview - хакерский взгляд
+/autobypass - авто-байпас
+/stealthfarm - невидимый фарм
 ]]
     elseif cmd == "/fly" then exec(toggleFly)
     elseif cmd == "/god" then exec(toggleGod)
@@ -1229,6 +1247,42 @@ Invisible: %s
         exec(spawnCity, desc)
     elseif cmd == "/base" then
         exec(spawnCity, "военная база с бункерами, ангарами и вышками")
+    elseif cmd == "/adapt" then
+        exec(autoAdaptCheat)
+    elseif cmd == "/shadow" then
+        exec(toggleShadow)
+    elseif cmd == "/chatbot" then
+        exec(toggleChatBot)
+    elseif cmd == "/autoscan" then
+        exec(toggleAutoScan)
+    elseif cmd == "/physics" then
+        exec(spawnPhysicsObjects, tonumber(arg) or 100)
+    elseif cmd == "/espplus" then
+        exec(toggleESPPlus)
+    elseif cmd == "/fakeplayers" then
+        exec(spawnFakePlayers, tonumber(arg) or 5)
+    elseif cmd == "/godforall" then
+        exec(godForAll)
+    elseif cmd == "/customcmd" then
+        exec(createCustomCommand, arg)
+    elseif cmd == "/antibanfull" then
+        exec(antiBanFull)
+    elseif cmd == "/dungeon" then
+        exec(createDungeon)
+    elseif cmd == "/farm2" then
+        exec(toggleFarm2)
+    elseif cmd == "/timescale" then
+        exec(setGlobalTimeScale, tonumber(arg) or 1)
+    elseif cmd == "/solve" then
+        exec(solvePuzzle)
+    elseif cmd == "/trader" then
+        exec(createTraderBot)
+    elseif cmd == "/infoview" then
+        exec(toggleInfoView)
+    elseif cmd == "/autobypass" then
+        exec(autoBypass)
+    elseif cmd == "/stealthfarm" then
+        exec(toggleStealthFarm)
     else
         response = "❌ Неизвестная команда. Введите /help"
     end
@@ -1261,7 +1315,7 @@ function startTelegramPolling()
             end
         end
     end)
-    telegramSend("🤖 NeuralOverride v7.3 подключён!")
+    telegramSend("🤖 NeuralOverride v8.1 подключён!")
 end
 
 function stopTelegramPolling()
@@ -1552,48 +1606,42 @@ function learnFromPlayer()
 end
 
 -- ================================================================
---  НОВЫЕ ФУНКЦИИ v7.3 (АВТООБНОВЛЕНИЕ, DISCORD, НЕВИДИМЫЙ СЕРВЕР, ГОРОДА, UI UPGRADE)
+--  НОВЫЕ ФУНКЦИИ v8.1 (АДАПТАЦИЯ, ЭКСТРА-МОДУЛЬ)
 -- ================================================================
 
--- Автообновление (фоновое)
-task.spawn(function()
-    while true do
-        task.wait(AUTO_UPDATE_INTERVAL)
-        local success, response = pcall(function()
-            return HttpService:GetAsync(UPDATE_URL)
-        end)
-        if success and response then
-            local newVer = response:match("CURRENT_VERSION%s*=%s*\"([^\"]+)\"")
-            if newVer and newVer ~= CURRENT_VERSION then
-                print("[NeuralOverride] Найдено обновление v" .. newVer .. ". Загрузка...")
-                local func, err = loadstring(response)
-                if func then
-                    func()
-                    print("[NeuralOverride] Обновление установлено!")
-                    sendDiscordLog("🔄 **Обновление установлено**", {title = "Автообновление", description = "Версия " .. newVer, color = 0x00ff00})
-                else
-                    warn("[NeuralOverride] Ошибка загрузки обновления: " .. tostring(err))
-                end
-            end
-        end
+-- Авто-адаптация под карту
+function autoAdaptCheat()
+    local currentPlaceId = game.PlaceId
+    local currentGameName = game:GetService("MarketplaceService"):GetProductInfo(currentPlaceId).Name or "Неизвестная карта"
+    print("[NeuralOverride] Запуск адаптации под карту: " .. currentGameName .. " (ID: " .. currentPlaceId .. ")")
+    local prompt = string.format([[
+Ты — хакерский ИИ для Roblox. Твоя задача – адаптировать чит под текущую карту.
+Информация о карте:
+- Название: %s
+- ID: %d
+- Количество объектов: %d
+- Игроков: %d
+Сгенерируй Lua-код, который сканирует игру на уязвимости, включает подходящие читы (аимбот, ESP, фарм, защиту) и настраивает параметры.
+Ответ только Lua-кодом.
+]], currentGameName, currentPlaceId, #Workspace:GetDescendants(), #Players:GetPlayers())
+    local code = askOpenRouter(prompt)
+    if code then
+        executeLua(code)
+        print("[NeuralOverride] Адаптация под карту выполнена!")
+        sendDiscordLog("🧠 **Адаптация под карту**", {title = "Адаптация", description = "Карта: " .. currentGameName, color = 0x00aaff})
+    else
+        warn("[NeuralOverride] Не удалось адаптироваться под карту")
     end
-end)
+end
 
--- Отправка лога запуска в Discord
-sendDiscordLog("🤖 **NeuralOverride v7.3 запущен!**", {
-    title = "Статус",
-    description = "Игрок: " .. player.Name .. "\nСервер: " .. game.PlaceId,
-    color = 0x00ff00
-})
-
--- Режим невидимого сервера
-local invisibleServerMode = false
-function toggleInvisibleServer()
-    invisibleServerMode = not invisibleServerMode
-    if invisibleServerMode then
-        player.DisplayName = " "
+-- Режим "Тень"
+local shadowMode = false
+function toggleShadow()
+    shadowMode = not shadowMode
+    if shadowMode then
         toggleInvisible()
         toggleNoClip()
+        player.DisplayName = " "
         local playerList = player.PlayerGui:FindFirstChild("PlayerList")
         if playerList then
             for _, v in ipairs(playerList:GetDescendants()) do
@@ -1602,82 +1650,395 @@ function toggleInvisibleServer()
                 end
             end
         end
-        for _, v in ipairs(workspace:GetDescendants()) do
-            if v:IsA("BillboardGui") and v.Name == "NameDisplay" then
-                local adornee = v.Adornee
-                if adornee and adornee.Parent == player.Character then
-                    v.Enabled = false
-                end
-            end
-        end
-        local prompt = [[
-            Сгенерируй Lua-код для Roblox, который скрывает игрока из списка игроков на сервере (удаляет его из Players или делает невидимым для других).
-            Используй RemoteEvent или другие методы. Ответ только кодом.
-        ]]
-        local code = askOpenRouter(prompt)
-        if code then executeLua(code) end
-        print("[NeuralOverride] Невидимый сервер ВКЛЮЧЁН")
-        sendDiscordLog("👻 **Невидимый сервер включён**", {title = "Статус", color = 0x8800ff})
+        print("[NeuralOverride] Режим «Тень» включён")
     else
-        player.DisplayName = player.Name
         toggleInvisible()
         toggleNoClip()
-        local playerList = player.PlayerGui:FindFirstChild("PlayerList")
-        if playerList then
-            for _, v in ipairs(playerList:GetDescendants()) do
-                if v:IsA("Frame") and v.Name == player.Name then
-                    v.Visible = true
-                end
-            end
-        end
-        for _, v in ipairs(workspace:GetDescendants()) do
-            if v:IsA("BillboardGui") and v.Name == "NameDisplay" then
-                local adornee = v.Adornee
-                if adornee and adornee.Parent == player.Character then
-                    v.Enabled = true
-                end
-            end
-        end
-        print("[NeuralOverride] Невидимый сервер ВЫКЛЮЧЕН")
-        sendDiscordLog("👁️ **Невидимый сервер выключен**", {title = "Статус", color = 0xff8800})
+        player.DisplayName = player.Name
+        print("[NeuralOverride] Режим «Тень» выключен")
     end
 end
 
--- Спавн городов
-function spawnCity(description)
-    description = description or "современный город с небоскрёбами и дорогами"
-    local prompt = string.format([[
-        Сгенерируй Lua-код для Roblox, который создаёт целый город или базу по описанию: "%s".
-        Используй множество Part с разными размерами, цветами, материалами (Concrete, Brick, Glass, Neon).
-        Город должен включать здания, дороги, деревья, фонари.
-        Создай около 100-200 объектов, размести их на карте в виде сетки.
-        Используй циклы и случайные позиции.
-        Ответ только кодом.
-    ]], description)
-    local code = askOpenRouter(prompt)
-    if code then
-        executeLua(code)
-        sendDiscordLog("🏙️ **Город создан**", {
-            title = "Спавн города",
-            description = "Описание: " .. description,
-            color = 0x00aaff
-        })
-        print("[NeuralOverride] Город создан!")
+-- Чат-бот
+local chatBotMode = false
+function toggleChatBot()
+    chatBotMode = not chatBotMode
+    if chatBotMode then
+        player.Chatted:Connect(function(msg)
+            if chatBotMode and msg:lower():find("привет") then
+                local chatEvent = ReplicatedStorage:FindFirstChild("DefaultChatSystemChatEvents")
+                if chatEvent then
+                    chatEvent.SayMessageRequest:FireServer("Привет! Я бот.")
+                end
+            end
+        end)
+        print("[NeuralOverride] Чат-бот включён")
     else
-        warn("[NeuralOverride] Не удалось сгенерировать город")
+        print("[NeuralOverride] Чат-бот выключен")
+    end
+end
+
+-- Авто-сканирование
+local autoScan = false
+function toggleAutoScan()
+    autoScan = not autoScan
+    if autoScan then
+        task.spawn(function()
+            while autoScan do
+                local prompt = "Сканируй игру на RemoteEvent, RemoteFunction, уязвимости. Сгенерируй код для эксплуатации."
+                local code = askOpenRouter(prompt)
+                if code then executeLua(code) end
+                task.wait(10)
+            end
+        end)
+        print("[NeuralOverride] Авто-сканирование запущено")
+    else
+        print("[NeuralOverride] Авто-сканирование остановлено")
+    end
+end
+
+-- Массовый спавн физических объектов
+function spawnPhysicsObjects(count)
+    count = count or 100
+    for i = 1, count do
+        local part = Instance.new("Part")
+        part.Size = Vector3.new(1,1,1)
+        part.BrickColor = BrickColor.random()
+        part.Material = Enum.Material.Neon
+        part.Anchored = false
+        part.Position = Vector3.new(math.random(-50,50), math.random(10,30), math.random(-50,50))
+        part.Velocity = Vector3.new(math.random(-20,20), math.random(10,30), math.random(-20,20))
+        part.Parent = Workspace
+        task.wait(0.01)
+    end
+    print("[NeuralOverride] Создано " .. count .. " объектов с физикой")
+end
+
+-- ESP+
+local espPlusEnabled = false
+local espPlusObjects = {}
+function toggleESPPlus()
+    espPlusEnabled = not espPlusEnabled
+    if espPlusEnabled then
+        for _, plr in ipairs(Players:GetPlayers()) do
+            if plr ~= player and plr.Character then
+                local root = plr.Character:FindFirstChild("HumanoidRootPart")
+                if root then
+                    local bill = Instance.new("BillboardGui")
+                    bill.Size = UDim2.new(0, 200, 0, 50)
+                    bill.Adornee = root
+                    bill.AlwaysOnTop = true
+                    bill.Parent = root
+                    local label = Instance.new("TextLabel")
+                    label.Size = UDim2.new(1,0,1,0)
+                    label.BackgroundTransparency = 1
+                    label.TextColor3 = Color3.new(1,1,0)
+                    label.TextScaled = true
+                    label.Font = Enum.Font.GothamBold
+                    label.Parent = bill
+                    table.insert(espPlusObjects, bill)
+                    task.spawn(function()
+                        while espPlusEnabled and bill.Parent do
+                            local hum = plr.Character:FindFirstChild("Humanoid")
+                            if hum then
+                                local health = math.floor(hum.Health)
+                                local dist = (root.Position - player.Character.HumanoidRootPart.Position).Magnitude
+                                label.Text = plr.Name .. "\n❤️ " .. health .. "/" .. hum.MaxHealth .. "\n📏 " .. math.floor(dist) .. "m"
+                            end
+                            task.wait(0.5)
+                        end
+                    end)
+                end
+            end
+        end
+        print("[NeuralOverride] ESP+ ON")
+    else
+        for _, obj in ipairs(espPlusObjects) do obj:Destroy() end
+        espPlusObjects = {}
+        print("[NeuralOverride] ESP+ OFF")
+    end
+end
+
+-- Фейковые игроки
+function spawnFakePlayers(count)
+    count = count or 5
+    for i = 1, count do
+        local name = "Fake_" .. math.random(1000,9999)
+        local prompt = string.format([[
+Сгенерируй Lua-код для создания фейкового игрока с именем '%s'. Он должен ходить случайно, отвечать в чате.
+]], name)
+        local code = askOpenRouter(prompt)
+        if code then executeLua(code) end
+        task.wait(0.5)
+    end
+    print("[NeuralOverride] Фейковые игроки созданы")
+end
+
+-- Погода через API
+function fetchWeather()
+    local success, response = pcall(function()
+        return HttpService:GetAsync("https://wttr.in/Moscow?format=%C+%t")
+    end)
+    if success then
+        local chatEvent = ReplicatedStorage:FindFirstChild("DefaultChatSystemChatEvents")
+        if chatEvent then
+            chatEvent.SayMessageRequest:FireServer("🌤️ Погода: " .. response)
+        end
+    end
+end
+
+-- Криптовалюта
+function fetchCrypto()
+    local success, response = pcall(function()
+        return HttpService:GetAsync("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd")
+    end)
+    if success then
+        local data = HttpService:JSONDecode(response)
+        if data and data.bitcoin then
+            local chatEvent = ReplicatedStorage:FindFirstChild("DefaultChatSystemChatEvents")
+            if chatEvent then
+                chatEvent.SayMessageRequest:FireServer("₿ BTC: $" .. data.bitcoin.usd)
+            end
+        end
+    end
+end
+
+-- Бог для всех
+function godForAll()
+    for _, plr in ipairs(Players:GetPlayers()) do
+        local hum = getHumanoid(plr)
+        if hum then
+            hum.MaxHealth = math.huge
+            hum.Health = math.huge
+            hum.WalkSpeed = 100
+            hum.JumpPower = 200
+        end
+    end
+    print("[NeuralOverride] Режим «Бог» для всех активирован")
+end
+
+-- Создание своей команды
+function createCustomCommand(description)
+    local prompt = string.format([[
+Сгенерируй полный Lua-код для новой команды в Roblox по описанию: "%s". Код должен быть готов к выполнению.
+]], description)
+    local code = askOpenRouter(prompt)
+    if code then executeLua(code) end
+end
+
+-- Полная защита от бана
+function antiBanFull()
+    game:SetAttribute("PlayerId", tostring(math.random(100000,999999)))
+    player.DisplayName = "Guest_" .. math.random(1000,9999)
+    for _, v in ipairs(Players:GetPlayers()) do
+        if v ~= player then
+            local report = v:FindFirstChild("ReportService")
+            if report then report:Destroy() end
+        end
+    end
+    local prompt = "Сгенерируй код для маскировки UserId, HardwareId, IP."
+    local code = askOpenRouter(prompt)
+    if code then executeLua(code) end
+    print("[NeuralOverride] Полная защита от бана активирована")
+end
+
+-- Подземелье
+function createDungeon()
+    local prompt = [[
+Сгенерируй Lua-код для создания подземелья с 5 комнатами, монстрами, ловушками и сундуком.
+]]
+    local code = askOpenRouter(prompt)
+    if code then executeLua(code) end
+end
+
+-- Фарм 2.0
+local farm2 = false
+function toggleFarm2()
+    farm2 = not farm2
+    if farm2 then
+        task.spawn(function()
+            while farm2 do
+                local prompt = "Сгенерируй Lua-код для эффективного фарма в этой игре."
+                local code = askOpenRouter(prompt)
+                if code then executeLua(code) end
+                task.wait(3)
+            end
+        end)
+        print("[NeuralOverride] Фарм 2.0 запущен")
+    else
+        print("[NeuralOverride] Фарм 2.0 остановлен")
+    end
+end
+
+-- Глобальная скорость
+function setGlobalTimeScale(speed)
+    local prompt = string.format([[
+Сгенерируй Lua-код для изменения скорости игры для всех в %s раз.
+]], speed)
+    local code = askOpenRouter(prompt)
+    if code then executeLua(code) end
+end
+
+-- Решение головоломок
+function solvePuzzle()
+    local prompt = "Сгенерируй Lua-код для поиска и решения головоломки в текущей игре."
+    local code = askOpenRouter(prompt)
+    if code then executeLua(code) end
+end
+
+-- Бот-торговец
+function createTraderBot()
+    local prompt = [[
+Сгенерируй Lua-код для создания бота-торговца, который предлагает обмен.
+]]
+    local code = askOpenRouter(prompt)
+    if code then executeLua(code) end
+end
+
+-- Хакерский взгляд
+local infoView = false
+function toggleInfoView()
+    infoView = not infoView
+    if infoView then
+        for _, plr in ipairs(Players:GetPlayers()) do
+            if plr ~= player and plr.Character then
+                local root = plr.Character:FindFirstChild("HumanoidRootPart")
+                if root then
+                    local bill = Instance.new("BillboardGui")
+                    bill.Size = UDim2.new(0, 300, 0, 80)
+                    bill.Adornee = root
+                    bill.AlwaysOnTop = true
+                    bill.Parent = root
+                    local label = Instance.new("TextLabel")
+                    label.Size = UDim2.new(1,0,1,0)
+                    label.BackgroundTransparency = 1
+                    label.TextColor3 = Color3.new(0,1,0)
+                    label.TextScaled = true
+                    label.Font = Enum.Font.GothamBold
+                    label.Parent = bill
+                    table.insert(espPlusObjects, bill)
+                    task.spawn(function()
+                        while infoView and bill.Parent do
+                            local hum = plr.Character:FindFirstChild("Humanoid")
+                            if hum then
+                                label.Text = string.format("%s\n❤️ %d/%d\n💵 %d\n🔫 %s",
+                                    plr.Name,
+                                    math.floor(hum.Health),
+                                    hum.MaxHealth,
+                                    plr:GetAttribute("Cash") or 0,
+                                    plr.Character:FindFirstChildWhichIsA("Tool") and plr.Character:FindFirstChildWhichIsA("Tool").Name or "Нет"
+                                )
+                            end
+                            task.wait(0.5)
+                        end
+                    end)
+                end
+            end
+        end
+        print("[NeuralOverride] Хакерский взгляд включён")
+    else
+        for _, obj in ipairs(espPlusObjects) do obj:Destroy() end
+        espPlusObjects = {}
+        print("[NeuralOverride] Хакерский взгляд выключен")
+    end
+end
+
+-- Авто-байпас
+function autoBypass()
+    disableAntiCheat()
+    local prompt = "Сгенерируй Lua-код для обхода античита (Byfron, Hyperion)."
+    local code = askOpenRouter(prompt)
+    if code then executeLua(code) end
+end
+
+-- Невидимый фарм
+local stealthFarm = false
+function toggleStealthFarm()
+    stealthFarm = not stealthFarm
+    if stealthFarm then
+        toggleInvisible()
+        toggleNoClip()
+        task.spawn(function()
+            while stealthFarm do
+                local prompt = "Сгенерируй Lua-код для сбора ресурсов без обнаружения."
+                local code = askOpenRouter(prompt)
+                if code then executeLua(code) end
+                task.wait(2)
+            end
+        end)
+        print("[NeuralOverride] Невидимый фарм включён")
+    else
+        toggleInvisible()
+        toggleNoClip()
+        print("[NeuralOverride] Невидимый фарм выключен")
+    end
+end
+
+-- Торнадо
+function tornadoMode()
+    local prompt = [[
+Сгенерируй Lua-код для создания торнадо: все части вращаются, игроки поднимаются в воздух.
+]]
+    local code = askOpenRouter(prompt)
+    if code then executeLua(code) end
+end
+
+-- Спавн транспорта
+function spawnVehicle(vehicleType)
+    vehicleType = vehicleType or "car"
+    local prompt = string.format([[
+Сгенерируй Lua-код для создания управляемого транспорта типа '%s'.
+]], vehicleType)
+    local code = askOpenRouter(prompt)
+    if code then executeLua(code) end
+end
+
+-- Авто-выполнение квестов
+local questAuto = false
+function toggleQuestAuto()
+    questAuto = not questAuto
+    if questAuto then
+        task.spawn(function()
+            while questAuto do
+                local prompt = "Сгенерируй Lua-код для выполнения шага квеста."
+                local code = askOpenRouter(prompt)
+                if code then executeLua(code) end
+                task.wait(5)
+            end
+        end)
+        print("[NeuralOverride] Авто-квесты запущены")
+    else
+        print("[NeuralOverride] Авто-квесты остановлены")
+    end
+end
+
+-- Авто-сбор ресурсов
+local autoCollect = false
+function toggleAutoCollect()
+    autoCollect = not autoCollect
+    if autoCollect then
+        task.spawn(function()
+            while autoCollect do
+                local prompt = "Сгенерируй Lua-код для поиска и подбора предметов."
+                local code = askOpenRouter(prompt)
+                if code then executeLua(code) end
+                task.wait(1)
+            end
+        end)
+        print("[NeuralOverride] Авто-сбор запущен")
+    else
+        print("[NeuralOverride] Авто-сбор остановлен")
     end
 end
 
 -- ================================================================
---  UI UPGRADE (перетаскиваемые окна, кнопка закрытия, стиль)
+--  UI UPGRADE (перетаскиваемые окна)
 -- ================================================================
-
 local function makeDraggable(frame, dragHandle)
     dragHandle = dragHandle or frame
     local dragging = false
     local dragStart = Vector2.new()
     local frameStart = UDim2.new()
-    
     dragHandle.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             dragging = true
@@ -1685,7 +2046,6 @@ local function makeDraggable(frame, dragHandle)
             frameStart = frame.Position
         end
     end)
-    
     dragHandle.InputChanged:Connect(function(input)
         if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
             local delta = input.Position - dragStart
@@ -1697,7 +2057,6 @@ local function makeDraggable(frame, dragHandle)
             )
         end
     end)
-    
     dragHandle.InputEnded:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             dragging = false
@@ -1809,326 +2168,6 @@ toggleAllBtn.MouseButton1Click:Connect(function()
     toggleAllBtn.Text = allVisible and "⊞" or "⊟"
 end)
 
-print("🎨 NEURAL OVERRIDE v7.3 UI UPGRADE ЗАГРУЖЕН!")
-
--- ================================================================
---  НОВОЕ МЕНЮ С КНОПКАМИ (v7.3)
--- ================================================================
-
-local function createNewMenu()
-    for _, gui in ipairs(player.PlayerGui:GetChildren()) do
-        if gui.Name:find("NeuralOverrideGUI") or gui.Name:find("TerminatorPanel") or gui.Name:find("RevolutionPanel") or gui.Name:find("ExtraControls") then
-            gui:Destroy()
-        end
-    end
-
-    local screenGui = Instance.new("ScreenGui")
-    screenGui.Name = "NeuralOverrideGUI"
-    screenGui.Parent = player.PlayerGui
-
-    local mainFrame = Instance.new("Frame")
-    mainFrame.Size = UDim2.new(0, 500, 0, 600)
-    mainFrame.Position = UDim2.new(0.5, -250, 0.1, 0)
-    mainFrame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.2)
-    mainFrame.BackgroundTransparency = 0.15
-    mainFrame.BorderSizePixel = 0
-    mainFrame.Parent = screenGui
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 12)
-    corner.Parent = mainFrame
-    local shadow = Instance.new("UIStroke")
-    shadow.Color = Color3.new(0,0,0)
-    shadow.Thickness = 2
-    shadow.Transparency = 0.5
-    shadow.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-    shadow.Parent = mainFrame
-
-    local title = Instance.new("TextLabel")
-    title.Name = "TitleLabel"
-    title.Size = UDim2.new(1, 0, 0, 30)
-    title.BackgroundColor3 = Color3.new(0.2, 0.2, 0.3)
-    title.BackgroundTransparency = 0.8
-    title.BorderSizePixel = 0
-    title.Text = "🧠 NEURAL OVERRIDE v7.3"
-    title.TextColor3 = Color3.new(1, 1, 1)
-    title.TextScaled = true
-    title.Font = Enum.Font.GothamBold
-    title.Parent = mainFrame
-    local closeBtn = Instance.new("TextButton")
-    closeBtn.Size = UDim2.new(0, 30, 0, 30)
-    closeBtn.Position = UDim2.new(1, -35, 0, 0)
-    closeBtn.Text = "✕"
-    closeBtn.TextColor3 = Color3.new(1, 0, 0)
-    closeBtn.BackgroundTransparency = 1
-    closeBtn.Font = Enum.Font.GothamBold
-    closeBtn.TextScaled = true
-    closeBtn.Parent = title
-    closeBtn.ZIndex = 10
-    closeBtn.MouseButton1Click:Connect(function()
-        mainFrame.Visible = not mainFrame.Visible
-    end)
-    makeDraggable(mainFrame, title)
-
-    local tabFrame = Instance.new("Frame")
-    tabFrame.Size = UDim2.new(1, 0, 0, 35)
-    tabFrame.Position = UDim2.new(0, 0, 0, 30)
-    tabFrame.BackgroundTransparency = 1
-    tabFrame.Parent = mainFrame
-
-    local tabs = {"Основное", "Боты/Монстры", "Взлом", "Уникальные", "Новые v7.3"}
-    local currentTab = 1
-    local tabButtons = {}
-
-    for i, name in ipairs(tabs) do
-        local btn = Instance.new("TextButton")
-        btn.Size = UDim2.new(0.2, -5, 1, -5)
-        btn.Position = UDim2.new((i - 1) * 0.2, 0, 0, 0)
-        btn.Text = name
-        btn.BackgroundColor3 = (i == 1) and Color3.new(0.3, 0.3, 0.6) or Color3.new(0.2, 0.2, 0.4)
-        btn.TextColor3 = Color3.new(1, 1, 1)
-        btn.Font = Enum.Font.GothamBold
-        btn.TextScaled = true
-        btn.Parent = tabFrame
-        btn.MouseButton1Click:Connect(function()
-            for _, b in ipairs(tabButtons) do
-                b.BackgroundColor3 = Color3.new(0.2, 0.2, 0.4)
-            end
-            btn.BackgroundColor3 = Color3.new(0.3, 0.3, 0.6)
-            currentTab = i
-            updateContent()
-        end)
-        table.insert(tabButtons, btn)
-    end
-
-    local contentFrame = Instance.new("ScrollingFrame")
-    contentFrame.Size = UDim2.new(1, 0, 1, -65)
-    contentFrame.Position = UDim2.new(0, 0, 0, 65)
-    contentFrame.BackgroundTransparency = 1
-    contentFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
-    contentFrame.ScrollBarThickness = 8
-    contentFrame.Parent = mainFrame
-
-    local layout = Instance.new("UIListLayout")
-    layout.Padding = UDim.new(0, 5)
-    layout.SortOrder = Enum.SortOrder.LayoutOrder
-    layout.Parent = contentFrame
-
-    local function addButton(text, callback, color)
-        local btn = Instance.new("TextButton")
-        btn.Size = UDim2.new(1, -10, 0, 35)
-        btn.Text = text
-        btn.BackgroundColor3 = color or Color3.new(0.2, 0.2, 0.8)
-        btn.TextColor3 = Color3.new(1, 1, 1)
-        btn.Font = Enum.Font.GothamBold
-        btn.TextScaled = true
-        btn.Parent = contentFrame
-        btn.MouseButton1Click:Connect(callback)
-        local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(0, 8)
-        corner.Parent = btn
-        local bg = btn.BackgroundColor3
-        btn.MouseEnter:Connect(function()
-            btn.BackgroundColor3 = bg:Lerp(Color3.new(1,1,1), 0.3)
-        end)
-        btn.MouseLeave:Connect(function()
-            btn.BackgroundColor3 = bg
-        end)
-        btn.MouseButton1Down:Connect(function()
-            btn.BackgroundColor3 = bg:Lerp(Color3.new(0,0,0), 0.3)
-            task.wait(0.1)
-            btn.BackgroundColor3 = bg
-        end)
-        task.defer(function()
-            contentFrame.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 10)
-        end)
-    end
-
-    function updateContent()
-        for _, child in ipairs(contentFrame:GetChildren()) do
-            if child:IsA("TextButton") then child:Destroy() end
-        end
-
-        if currentTab == 1 then
-            addButton("✈️ Fly", toggleFly, Color3.new(0,0.8,1))
-            addButton("📡 Teleport", function()
-                local name = game:GetService("TextBoxService"):GetTextBox("Имя игрока")
-                if name and name ~= "" then teleportToPlayer(name) end
-            end, Color3.new(0,1,0.5))
-            addButton("🛡️ God Mode", toggleGod, Color3.new(0.5,0.5,1))
-            addButton("🔫 Spawn Weapon", spawnWeapon, Color3.new(1,0.5,0))
-            addButton("📨 Mass Invite", massInvite, Color3.new(0.2,1,0.6))
-            addButton("👥 Summon All", summonAllPlayers, Color3.new(1,0.8,0))
-            addButton("🌀 All Modes", allModes, Color3.new(0.8,0,0.8))
-            addButton("💀 Kill All", killAll, Color3.new(1,0,0))
-            addButton("🚀 Fly All", flyAll, Color3.new(0,0.8,0.8))
-            addButton("🌍 Global Chaos", globalChaos, Color3.new(0.9,0.1,0.5))
-            addButton("🚀 Invade", invade, Color3.new(0.8,0.4,0))
-            addButton("💥 Server Crasher", serverCrasher, Color3.new(1,0.2,0.2))
-            addButton("🧊 Freeze All", freezeAll, Color3.new(0,0.6,1))
-            addButton("🦴 Ragdoll All", ragdollAll, Color3.new(0.8,0.5,0))
-            addButton("👥 Teleport All to Me", teleportAllToMe, Color3.new(0.9,0.5,0.8))
-        elseif currentTab == 2 then
-            addButton("🧟 Spawn Bots (10)", function() spawnBots(10) end, Color3.new(0.8,0.6,0))
-            addButton("🧟 Spawn Bots (50)", function() spawnBots(50) end, Color3.new(0.8,0.6,0))
-            addButton("👹 Smart Monsters (10)", function() spawnSmartMonsters(10) end, Color3.new(0.8,0,0.6))
-            addButton("👹 Smart Monsters (30)", function() spawnSmartMonsters(30) end, Color3.new(0.8,0,0.6))
-            addButton("🌀 Portal (5)", function() createPortals(5) end, Color3.new(0.5,0,0.8))
-            addButton("🌀 Portal (15)", function() createPortals(15) end, Color3.new(0.5,0,0.8))
-            addButton("🤖 AutoBot", function() createAutoBot() end, Color3.new(0.2,0.8,0.8))
-            addButton("👑 God Bot", godBotMode, Color3.new(0.8,0.8,0))
-            addButton("👥 Clone Player", function()
-                local name = game:GetService("TextBoxService"):GetTextBox("Имя игрока")
-                if name and name ~= "" then clonePlayer(name) end
-            end, Color3.new(0.2,0.4,0.8))
-            addButton("🏃 Follow Me", followMe, Color3.new(0,0.6,0.6))
-            addButton("👾 Clone Army (50)", function() cloneArmy(50) end, Color3.new(0.6,0.2,0.9))
-        elseif currentTab == 3 then
-            addButton("💀 Hack Target", function()
-                local name = game:GetService("TextBoxService"):GetTextBox("Имя цели")
-                if name and name ~= "" then hackTarget(name) end
-            end, Color3.new(1,0,0))
-            addButton("💀 DDoS Target", function()
-                local name = game:GetService("TextBoxService"):GetTextBox("Имя цели")
-                if name and name ~= "" then ddosTarget(name) end
-            end, Color3.new(1,0.3,0))
-            addButton("👁️ Track Player", function()
-                local name = game:GetService("TextBoxService"):GetTextBox("Имя цели")
-                if name and name ~= "" then trackPlayer(name) end
-            end, Color3.new(0,0.8,0.8))
-            addButton("💥 Remote Ban", remoteBan, Color3.new(0.8,0,0.8))
-            addButton("💥 Game Crash", crashGame, Color3.new(1,0.5,0))
-            addButton("📦 Steal DataStore", stealDataStore, Color3.new(0.2,0.6,1))
-            addButton("🍪 Steal Cookie", stealCookie, Color3.new(0.2,0.8,0.4))
-            addButton("⌨️ Keylog", toggleKeylog, Color3.new(0.5,0.5,0.5))
-            addButton("💻 Exploit Shell", function()
-                local cmd = game:GetService("TextBoxService"):GetTextBox("Команда")
-                if cmd and cmd ~= "" then executeShell(cmd) end
-            end, Color3.new(0.6,0.2,0.4))
-            addButton("🔍 Hack All", hackAll, Color3.new(0.9,0.2,0.2))
-            addButton("📡 Admin Panel", function()
-                local prompt = "Сгенерируй Lua-код для создания админ-панели в Roblox: GUI с кнопками (кик, бан, телепорт, дать предмет)."
-                aiCommand(prompt)
-            end, Color3.new(0.3,0.8,0.3))
-            addButton("🛡 Bypass Defenses", bypassAllDefenses, Color3.new(0.1,0.9,0.1))
-            addButton("🔓 Admin Hack", adminHack, Color3.new(0.8,0.4,0))
-            addButton("📡 Взлом через AI", function()
-                local prompt = game:GetService("TextBoxService"):GetTextBox("Введите запрос для нейросети")
-                if prompt and prompt ~= "" then aiCommand(prompt) end
-            end, Color3.new(0.5,0.5,0.8))
-        elseif currentTab == 4 then
-            addButton("🎯 Aimbot", toggleAimbot, Color3.new(0,1,0.3))
-            addButton("🎯 Silent Aim", toggleSilentAim, Color3.new(0,0.8,0.5))
-            addButton("👁️ ESP", toggleESP, Color3.new(0,0.5,1))
-            addButton("🚫 Anti-Kick", toggleAntiKick, Color3.new(1,0.5,0))
-            addButton("💨 Speed (100)", function() setSpeed(100) end, Color3.new(0.2,0.8,0.8))
-            addButton("💨 Speed (200)", function() setSpeed(200) end, Color3.new(0.2,0.8,0.8))
-            addButton("🧱 NoClip", toggleNoClip, Color3.new(0.6,0.3,0.9))
-            addButton("🦘 Infinite Jump", toggleInfiniteJump, Color3.new(0,1,0.6))
-            addButton("👻 Invisible", toggleInvisible, Color3.new(0.4,0.4,0.8))
-            addButton("☀️ FullBright", setFullBright, Color3.new(1,1,0.2))
-            addButton("💬 Anti-AFK", toggleAntiAFK, Color3.new(0.3,0.7,0.4))
-            addButton("🌀 Infinite Yield", function() infiniteYield() end, Color3.new(0.8,0.2,0.6))
-            addButton("🛡️ Anti-Ban", antiBan, Color3.new(0,0.6,0.6))
-            addButton("🧹 Clear GUI", clearGUI, Color3.new(0.4,0.4,0.4))
-            addButton("💥 Spawn Parts (500)", function() spawnParts(500) end, Color3.new(0.8,0.4,0.2))
-            addButton("🧠 Mind Control", function()
-                local name = game:GetService("TextBoxService"):GetTextBox("Имя игрока")
-                if name and name ~= "" then mindControl(name) end
-            end, Color3.new(0.8,0.2,0.8))
-            addButton("👤 Fake Player", function()
-                local name = game:GetService("TextBoxService"):GetTextBox("Имя фейка")
-                if name and name ~= "" then createFakePlayer(name) end
-            end, Color3.new(0.2,0.6,0.8))
-            addButton("🌤️ Weather", function()
-                local type = game:GetService("TextBoxService"):GetTextBox("Тип погоды (дождь/снег/туман/буря)")
-                if type and type ~= "" then changeWeather(type) end
-            end, Color3.new(0.2,0.8,0.6))
-            addButton("🌀 Zone (low gravity)", createZone, Color3.new(0.6,0.2,0.6))
-            addButton("🏗️ Build", function()
-                local desc = game:GetService("TextBoxService"):GetTextBox("Описание постройки")
-                if desc and desc ~= "" then buildFromDescription(desc) end
-            end, Color3.new(0.8,0.5,0.2))
-            addButton("⚔️ Force PvP", forcePvP, Color3.new(0.8,0.2,0))
-            addButton("☠️ Curse Player", function()
-                local name = game:GetService("TextBoxService"):GetTextBox("Имя игрока")
-                if name and name ~= "" then cursePlayer(name) end
-            end, Color3.new(0.2,0.2,0.8))
-            addButton("🔄 Invert Controls", invertControls, Color3.new(0.5,0.5,0))
-            addButton("🎒 Scramble Inventory", scrambleInventory, Color3.new(0.8,0.6,0.4))
-            addButton("🐾 Steal Pet", function()
-                local name = game:GetService("TextBoxService"):GetTextBox("Имя игрока")
-                if name and name ~= "" then stealPet(name) end
-            end, Color3.new(0.2,0.8,0.4))
-            addButton("🚫 Fake Ban", function()
-                local name = game:GetService("TextBoxService"):GetTextBox("Имя игрока")
-                if name and name ~= "" then fakeBan(name) end
-            end, Color3.new(0.8,0.2,0.4))
-            addButton("🎵 Music All", function()
-                local id = game:GetService("TextBoxService"):GetTextBox("ID музыки")
-                if id and id ~= "" then playMusicForAll(id) end
-            end, Color3.new(0.2,0.8,0.8))
-            addButton("📢 Notify All", function()
-                local text = game:GetService("TextBoxService"):GetTextBox("Текст уведомления")
-                if text and text ~= "" then notifyAll(text) end
-            end, Color3.new(0.8,0.8,0.2))
-            addButton("👥 Clone Control", cloneWithControl, Color3.new(0.6,0.4,0.8))
-            addButton("👻 Possession", possession, Color3.new(0.8,0,0.8))
-            addButton("⏳ Time Warp", function()
-                local speed = game:GetService("TextBoxService"):GetTextBox("Скорость (число)")
-                if speed and speed ~= "" then timeWarp(tonumber(speed) or 2) end
-            end, Color3.new(0.2,0.4,0.8))
-            addButton("💣 Spawn Trap", spawnTrap, Color3.new(0.8,0.4,0.2))
-            addButton("🏝️ Spawn Island", spawnIsland, Color3.new(0,0.6,0.6))
-            addButton("💬 Chat Control", function()
-                local name = game:GetService("TextBoxService"):GetTextBox("Имя игрока")
-                local msg = game:GetService("TextBoxService"):GetTextBox("Сообщение")
-                if name and msg and name~="" and msg~="" then chatControl(name, msg) end
-            end, Color3.new(0.4,0.4,0.8))
-        elseif currentTab == 5 then
-            addButton("🏙️ Создать город", function()
-                local desc = game:GetService("TextBoxService"):GetTextBox("Опишите город (или оставьте пустым)")
-                spawnCity(desc or nil)
-            end, Color3.new(0.2,0.6,0.8))
-            addButton("🏰 Военная база", function() spawnCity("военная база с бункерами, ангарами и вышками") end, Color3.new(0.2,0.8,0.4))
-            addButton("👻 Невидимый сервер", toggleInvisibleServer, Color3.new(0.6,0.2,0.9))
-            addButton("📢 Discord тест", function()
-                sendDiscordLog("✅ Тест из GUI", {title = "Тест", description = "Discord работает!", color = 0x00aaff})
-            end, Color3.new(0.3,0.3,0.8))
-            addButton("🔫 Терминатор", toggleTerminator, Color3.new(1,0.2,0.2))
-            addButton("🛡️ Обход защит", bypassAllDefenses, Color3.new(0.1,0.9,0.1))
-            addButton("💣 Nuke", nuke, Color3.new(1,0.5,0))
-            addButton("👾 Армия клонов (50)", function() cloneArmy(50) end, Color3.new(0,0.8,0.4))
-            addButton("💰 Кража всего инвентаря", stealAllInventory, Color3.new(1,0.8,0))
-            addButton("💥 Mega Crash", megaCrash, Color3.new(1,0,0))
-            addButton("🌀 Инверт реальности", invertReality, Color3.new(0.5,0,0.8))
-            addButton("👻 Призрачный убийца", toggleAssassin, Color3.new(0.6,0.2,0.9))
-            addButton("⏳ Автофарм", startAutoFarm, Color3.new(0.2,0.6,0.2))
-            addButton("🔓 Взлом админки", adminHack, Color3.new(0.8,0.4,0))
-            addButton("🏝️ Летающий остров", spawnIsland, Color3.new(0,0.6,0.6))
-            addButton("💬 Управление чатом", function()
-                local name = game:GetService("TextBoxService"):GetTextBox("Имя игрока")
-                local msg = game:GetService("TextBoxService"):GetTextBox("Сообщение")
-                if name and msg and name~="" and msg~="" then chatControl(name, msg) end
-            end, Color3.new(0.4,0.4,0.8))
-            addButton("🤖 Создать чит", function()
-                local desc = game:GetService("TextBoxService"):GetTextBox("Опишите чит")
-                if desc and desc ~= "" then makeCheat(desc) end
-            end, Color3.new(0.2,0.8,0.8))
-            addButton("📡 Telegram (вкл/выкл)", function()
-                if telegramPolling then stopTelegramPolling() else startTelegramPolling() end
-            end, Color3.new(0.8,0.6,0))
-            addButton("🔄 Принудительное обновление", function()
-                loadstring(game:HttpGet(UPDATE_URL))()
-            end, Color3.new(0.6,0.6,0))
-        end
-    end
-
-    updateContent()
-end
-
-task.wait(1)
-createNewMenu()
-
 -- ================================================================
 --  ОБРАБОТЧИК ВСЕХ КОМАНД (чат)
 -- ================================================================
@@ -2219,6 +2258,30 @@ player.Chatted:Connect(function(msg)
     elseif cmd == "/discord" then
         sendDiscordLog("✅ **Команда /discord выполнена**", {title = "Тест", description = "Discord интеграция работает!", color = 0x00aaff})
         print("[Discord] Тест отправлен")
+    elseif cmd == "/adapt" then autoAdaptCheat()
+    elseif cmd == "/shadow" then toggleShadow()
+    elseif cmd == "/chatbot" then toggleChatBot()
+    elseif cmd == "/autoscan" then toggleAutoScan()
+    elseif cmd == "/physics" then spawnPhysicsObjects(tonumber(arg) or 100)
+    elseif cmd == "/espplus" then toggleESPPlus()
+    elseif cmd == "/fakeplayers" then spawnFakePlayers(tonumber(arg) or 5)
+    elseif cmd == "/weather2" then fetchWeather()
+    elseif cmd == "/crypto" then fetchCrypto()
+    elseif cmd == "/godforall" then godForAll()
+    elseif cmd == "/customcmd" then createCustomCommand(arg)
+    elseif cmd == "/antibanfull" then antiBanFull()
+    elseif cmd == "/dungeon" then createDungeon()
+    elseif cmd == "/farm2" then toggleFarm2()
+    elseif cmd == "/timescale" then setGlobalTimeScale(tonumber(arg) or 1)
+    elseif cmd == "/solve" then solvePuzzle()
+    elseif cmd == "/trader" then createTraderBot()
+    elseif cmd == "/infoview" then toggleInfoView()
+    elseif cmd == "/autobypass" then autoBypass()
+    elseif cmd == "/stealthfarm" then toggleStealthFarm()
+    elseif cmd == "/tornado" then tornadoMode()
+    elseif cmd == "/vehicle" then spawnVehicle(arg)
+    elseif cmd == "/questauto" then toggleQuestAuto()
+    elseif cmd == "/autocollect" then toggleAutoCollect()
     elseif cmd == "/ai" then aiCommand(arg)
     elseif cmd == "/save" then saveScript(arg, arg2)
     elseif cmd == "/run" then runScript(arg)
@@ -2238,8 +2301,7 @@ end)
 -- ===== ДОПОЛНИТЕЛЬНЫЕ МЕГА-ФУНКЦИИ (NUKE, ARMY, STEAL ALL, etc.) =====
 function megaCrash()
     local prompt = [[
-Сгенерируй Lua-код для Roblox, который создаёт 50000 объектов в Workspace за 0.1 секунды (Part с размером 1, случайные позиции). Это должно вызвать краш сервера или сильный лаг.
-Ответ только кодом.
+Сгенерируй Lua-код для создания 50000 объектов в Workspace за 0.1 сек.
 ]]
     local code = askOpenRouter(prompt)
     if code then executeLua(code) end
@@ -2247,16 +2309,14 @@ end
 
 function invertReality()
     local prompt = [[
-Сгенерируй Lua-код для Roblox, который инвертирует управление (W↔S, A↔D), меняет цвета всех частей на инвертированные (Color3(1-r,1-g,1-b)), меняет гравитацию на -50 и включает замедление времени (RunService.RenderStepped с задержкой).
-Сделай так, чтобы эффект применялся ко всем игрокам через RemoteEvent или локально (если не получится).
-Ответ только кодом.
+Сгенерируй Lua-код для инвертирования управления, цветов, гравитации.
 ]]
     local code = askOpenRouter(prompt)
     if code then executeLua(code) end
 end
 
 function makeCheat(description)
-    local prompt = string.format("Сгенерируй Lua-код для Roblox, который реализует: %s. Код должен быть готов к выполнению.", description)
+    local prompt = string.format("Сгенерируй Lua-код для реализации: %s.", description)
     local code = askOpenRouter(prompt)
     if code then executeLua(code) end
 end
@@ -2380,7 +2440,6 @@ function toggleAssassin()
         toggleInvisible()
         toggleNoClip()
         toggleGod()
-        print("[NeuralOverride] Режим призрачного убийцы включён")
         assassinConnection = RunService.Heartbeat:Connect(function()
             local char = player.Character
             if not char then return end
@@ -2401,13 +2460,14 @@ function toggleAssassin()
                 end
             end
         end)
+        print("[NeuralOverride] Призрачный убийца включён")
     else
         if assassinConnection then assassinConnection:Disconnect() end
         assassinConnection = nil
         toggleInvisible()
         toggleNoClip()
         toggleGod()
-        print("[NeuralOverride] Режим призрачного убийцы выключен")
+        print("[NeuralOverride] Призрачный убийца выключен")
     end
 end
 
@@ -2415,15 +2475,15 @@ local farmRunning = false
 function startAutoFarm()
     farmRunning = not farmRunning
     if farmRunning then
-        print("[NeuralOverride] Автофарм запущен (нейросеть ищет лучший способ)")
         task.spawn(function()
             while farmRunning do
-                local prompt = "Сгенерируй Lua-код для выполнения одного действия по фарму в этой игре (например, клик по объекту, сбор ресурсов). Ответ только кодом."
+                local prompt = "Сгенерируй код для действия по фарму."
                 local code = askOpenRouter(prompt)
                 if code then executeLua(code) end
                 task.wait(5)
             end
         end)
+        print("[NeuralOverride] Автофарм запущен")
     else
         print("[NeuralOverride] Автофарм остановлен")
     end
@@ -2431,8 +2491,7 @@ end
 
 function adminHack()
     local prompt = [[
-Сгенерируй Lua-код для Roblox, который ищет и взламывает админ-панель (например, скрипты с "Admin", "Commands" в названии) и даёт игроку доступ ко всем командам (бан, кик, телепорт, спавн).
-Ответ только кодом.
+Сгенерируй Lua-код для взлома админ-панели.
 ]]
     local code = askOpenRouter(prompt)
     if code then executeLua(code) end
@@ -2477,17 +2536,28 @@ function spawnIsland()
 end
 
 function chatControl(target, message)
-    local prompt = string.format("Сгенерируй Lua-код для отправки сообщения '%s' в чат от имени игрока %s, а также удаления последних 3 сообщений всех игроков.", message, target)
+    local prompt = string.format("Сгенерируй код для отправки сообщения '%s' от имени %s.", message, target)
     local code = askOpenRouter(prompt)
     if code then executeLua(code) end
 end
 
--- ===== ЗАПУСК =====
+-- ================================================================
+--  ЗАПУСК АВТО-АДАПТАЦИИ, TELEGRAM, GUI
+-- ================================================================
+
+-- Авто-адаптация при старте
+task.spawn(function()
+    task.wait(5)
+    autoAdaptCheat()
+end)
+
+-- Запуск Telegram
 if TELEGRAM_BOT_TOKEN ~= "6543702999:AAErdz5CP5xsrm1G_RHWkAJnV4CU3GCX76M" then
     startTelegramPolling()
 end
 
-print("🧠 NEURAL OVERRIDE v7.3 ULTIMATE FULL EDITION ЗАГРУЖЕНА!")
-print("📋 Команды: /help, /city, /base, /invisibleserver, /discord")
+print("🧠 NEURAL OVERRIDE v8.1 ULTIMATE FULL EDITION ЗАГРУЖЕНА!")
+print("📋 Команды: /help, /adapt, /shadow, /chatbot, /autoscan, /physics, /espplus, /fakeplayers, /weather2, /crypto, /godforall, /customcmd, /antibanfull, /dungeon, /farm2, /timescale, /solve, /trader, /infoview, /autobypass, /stealthfarm, /tornado, /vehicle, /questauto, /autocollect, и многие другие.")
 print("🔄 Автообновление активно, Discord логи включены.")
 print("🎨 UI улучшен: все окна перетаскиваемые, с кнопками закрытия.")
+print("🔥 Адаптивный чит под карту активирован автоматически!")
